@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { PrismaService } from './prisma.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
   imports: [
@@ -14,6 +15,16 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         secret: configService.get<string>('JWT_SECRET'),
       }),
     }),
+    ClientsModule.register([
+      {
+        name: 'USER_SERVICE',
+        options: {
+          host: 'localhost',
+          port: 3002,
+        },
+        transport: Transport.TCP,
+      },
+    ]),
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

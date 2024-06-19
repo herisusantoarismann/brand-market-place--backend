@@ -12,3 +12,31 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model UserProfile {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @unique
+  phoneNumber   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  addressBooks  AddressBook[]
+
+  @@index([userId])
+}
+
+// Definisi model untuk addressBook
+model AddressBook {
+  id             Int      @id @default(autoincrement())
+  userProfile    UserProfile @relation(fields: [userProfileId], references: [id])
+  userProfileId  Int
+  type           String   
+  recipientName  String
+  addressLine    String
+  city           String
+  state          String
+  postalCode     String
+  isDefault      Boolean
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}

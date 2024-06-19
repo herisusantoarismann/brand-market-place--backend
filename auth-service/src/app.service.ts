@@ -33,6 +33,7 @@ export class AppService {
       },
       select: {
         id: true,
+        name: true,
         email: true,
       },
     });
@@ -45,6 +46,7 @@ export class AppService {
       },
       select: {
         id: true,
+        name: true,
         email: true,
         password: true,
       },
@@ -68,6 +70,7 @@ export class AppService {
       },
       select: {
         id: true,
+        name: true,
         email: true,
       },
     });
