@@ -9,6 +9,7 @@ import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './shared/dto/register.dto';
 import { IUser } from './shared/interfaces/user.interface';
 import { RpcException } from '@nestjs/microservices';
+import { LoginDto } from './shared/dto/login.dto';
 
 @Injectable()
 export class AppService {
@@ -50,17 +51,17 @@ export class AppService {
     });
   }
 
-  async login(email: string, password: string): Promise<IUser> {
-    const user = await this.validateUser(email, password);
+  async login(loginDto: LoginDto): Promise<IUser> {
+    const user = await this.validateUser(loginDto.email, loginDto.password);
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new RpcException(new UnauthorizedException('Invalid credentials'));
     }
-    const accessToken = this.generateToken(user?.email);
-    const refreshToken = this.generateToken(user?.email, '7d');
+    const accessToken = this.generateToken(user.email);
+    const refreshToken = this.generateToken(user.email, '7d');
 
     const newUser = await this.prisma.auth.update({
       where: {
-        email,
+        email: loginDto.email,
       },
       data: {
         refreshToken,
@@ -79,7 +80,7 @@ export class AppService {
   }
 
   private generateToken(email: string, expires: string = '1d'): string {
-    const payload = { email: email };
+    const payload = { email };
     return this.jwtService.sign(payload, { expiresIn: expires });
   }
 
