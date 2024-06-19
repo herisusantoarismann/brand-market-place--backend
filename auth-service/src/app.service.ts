@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './shared/dto/register.dto';
 import { IUser } from './shared/interfaces/user.interface';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class AppService {
@@ -19,7 +20,7 @@ export class AppService {
   async register(registerDto: RegisterDto): Promise<IUser> {
     const existingUser = await this.findByEmail(registerDto.email);
     if (existingUser) {
-      throw new BadRequestException('Email already exists');
+      throw new RpcException(new BadRequestException('Email already exists'));
     }
 
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
