@@ -15,9 +15,12 @@ datasource db {
 
 model Auth{
   id            Int       @id @default(autoincrement())
+  name          String
   email         String    @unique
   password      String?
   provider      String?
   refreshToken  String?
   createdAt     DateTime  @default(now())
+
+  @@map("auth")
 }
