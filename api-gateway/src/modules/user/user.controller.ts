@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
@@ -54,7 +55,23 @@ export class UserController {
         {
           cmd: 'update_user_profile',
         },
-        { id, data: updateUserProfileDto },
+        { id: Number(id), data: updateUserProfileDto },
+      )
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  @Delete('/:id')
+  delete(@Param('id') id: string): Observable<any> {
+    return this._userService
+      .send(
+        {
+          cmd: 'delete_user_profile',
+        },
+        Number(id),
       )
       .pipe(
         catchError((error) =>

@@ -43,10 +43,22 @@ export class UserProfileController {
     success: boolean;
     data: any;
   }> {
-    const user = await this._userProfileService.update(
-      Number(data.id),
-      data.data,
-    );
+    const user = await this._userProfileService.update(data.id, data.data);
+
+    return {
+      success: true,
+      data: user,
+    };
+  }
+
+  @MessagePattern({
+    cmd: 'delete_user_profile',
+  })
+  async deleteUserProfile(id: number): Promise<{
+    success: boolean;
+    data: any;
+  }> {
+    const user = await this._userProfileService.delete(id);
 
     return {
       success: true,
