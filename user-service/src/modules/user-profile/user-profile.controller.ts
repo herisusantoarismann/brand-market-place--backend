@@ -3,6 +3,7 @@ import { UserProfileService } from './user-profile.service';
 import { MessagePattern } from '@nestjs/microservices';
 import { CreateUserProfileDto } from './dto/create-user-profile.dto';
 import { IUserProfile } from 'src/shared/interfaces/user-profile.interface';
+import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 
 @Controller('user-profile')
 export class UserProfileController {
@@ -27,6 +28,25 @@ export class UserProfileController {
     data: IUserProfile;
   }> {
     const user = await this._userProfileService.create(createUserProfileDto);
+
+    return {
+      success: true,
+      data: user,
+    };
+  }
+
+  @MessagePattern({ cmd: 'update_user_profile' })
+  async updateUserProfile(data: {
+    id: number;
+    data: UpdateUserProfileDto;
+  }): Promise<{
+    success: boolean;
+    data: any;
+  }> {
+    const user = await this._userProfileService.update(
+      Number(data.id),
+      data.data,
+    );
 
     return {
       success: true,
