@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Inject } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { Observable, catchError, throwError } from 'rxjs';
+import { CreateUserProfileDto } from './dto/create-user-profile.dto';
 
 @Controller('users')
 export class UserController {
@@ -13,9 +14,20 @@ export class UserController {
   }
 
   @Get('/')
-  register(): Observable<any> {
+  findAll(): Observable<any> {
     return this.userService
-      .send({ cmd: 'getUsers' }, '')
+      .send({ cmd: 'find_all_user_profile' }, '')
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  @Post('/')
+  create(@Body() createUserProfileDto: CreateUserProfileDto): Observable<any> {
+    return this.userService
+      .send({ cmd: 'create_user_profile' }, createUserProfileDto)
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),

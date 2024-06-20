@@ -23,6 +23,7 @@ model UserProfile {
   addressBooks  AddressBook[]
 
   @@index([userId])
+  @@map("user_profile")
 }
 
 // Definisi model untuk addressBook
@@ -39,4 +40,6 @@ model AddressBook {
   isDefault      Boolean
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+
+  @@map("address_book")
 }

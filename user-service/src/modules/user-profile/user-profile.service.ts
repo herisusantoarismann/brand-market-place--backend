@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { CreateUserProfileDto } from 'src/modules/user-profile/dto/create-user-profile.dto';
+import { CreateUserProfileDto } from './dto/create-user-profile.dto';
 import { IUserProfile } from 'src/shared/interfaces/user-profile.interface';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { RpcException } from '@nestjs/microservices';
@@ -27,6 +27,12 @@ export class UserProfileService {
         },
       },
     };
+  }
+
+  async findAll(): Promise<IUserProfile[]> {
+    return this._prisma.userProfile.findMany({
+      select: this.getSelectedProperties(),
+    });
   }
 
   async create(
