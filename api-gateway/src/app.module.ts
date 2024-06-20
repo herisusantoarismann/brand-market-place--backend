@@ -1,28 +1,20 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import {
-  ClientProxyFactory,
-  ClientsModule,
-  Transport,
-} from '@nestjs/microservices';
+import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './modules/auth/auth.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ValidationErrorsInterceptor } from './shared/exceptions/validation.exception';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot(),
-    ClientsModule.register([
-      {
-        name: 'AUTH_SERVICE',
-        options: {
-          host: 'localhost',
-          port: 3001,
-        },
-        transport: Transport.TCP,
-      },
-    ]),
-  ],
+  imports: [ConfigModule.forRoot(), AuthModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ValidationErrorsInterceptor,
+    },
+  ],
 })
 export class AppModule {}
