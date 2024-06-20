@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Brand{
+  id            Int           @id @default(autoincrement())
+  name          String
+  description   String?       @db.Text
+  image         BrandImage[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("brands")
+}
+
+model Product {
+  id           Int            @id @default(autoincrement())
+  name         String
+  description  String
+  price        Float
+  sizes        Size[]
+  reviews      Review[]
+  images       ProductImage[]
+  wishlists    Wishlist[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@map("products")
+}
+
+model Size {
+  id        Int      @id @default(autoincrement())
+  value     Float
+  productId Int 
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@map("sizes")
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  author    String
+  content   String
+  rating    Float
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@map("reviews")
+}
+
+model BrandImage{
+  id        Int      @id @default(autoincrement())
+  url       String
+  brandId   Int
+  brand     Brand  @relation(fields: [brandId], references: [id])
+
+  @@map("brand_image")
+}
+
+model ProductImage {
+  id        Int      @id @default(autoincrement())
+  url       String
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@map("product_image")
+}
+
+model Wishlist {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@map("whislists")
+}
