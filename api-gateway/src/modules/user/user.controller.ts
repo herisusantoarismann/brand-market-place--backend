@@ -36,6 +36,17 @@ export class UserController {
       );
   }
 
+  @Get('/:userId')
+  findUser(@Param('userId') userId: string): Observable<any> {
+    return this._userService
+      .send({ cmd: 'find_user_profile' }, +userId)
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
   @Post('/')
   create(@Body() createUserProfileDto: CreateUserProfileDto): Observable<any> {
     return this._userService
