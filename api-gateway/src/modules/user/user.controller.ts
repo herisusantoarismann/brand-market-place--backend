@@ -104,6 +104,17 @@ export class UserController {
       );
   }
 
+  @Get('/:userId/address-book/:id')
+  findAddressBooks(@Param('id') id: string): Observable<any> {
+    return this._userService
+      .send({ cmd: 'find_address_book' }, +id)
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
   @Post('/:id/address-book')
   createUserAddressBook(
     @Param('id') id: string,

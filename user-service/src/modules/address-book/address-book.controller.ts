@@ -22,6 +22,19 @@ export class AddressBookController {
     };
   }
 
+  @MessagePattern({ cmd: 'find_address_book' })
+  async find(id: number): Promise<{
+    success: boolean;
+    data: IAddressBook[];
+  }> {
+    const addressBooks = await this._addressBookService.findAll(id);
+
+    return {
+      success: true,
+      data: addressBooks,
+    };
+  }
+
   @MessagePattern({ cmd: 'create_address_book' })
   async createAddressBook(data: {
     id: number;
