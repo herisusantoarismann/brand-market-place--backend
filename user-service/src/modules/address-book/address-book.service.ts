@@ -71,16 +71,17 @@ export class AddressBookService {
     });
   }
 
-  async delete(id: number): Promise<IAddressBook> {
+  async delete(id: number, userId: number): Promise<IAddressBook> {
     const addressBook = await this.findById(id);
 
     if (!addressBook) {
-      throw new RpcException(new BadRequestException('User Not Found'));
+      throw new RpcException(new BadRequestException('Address Book Not Found'));
     }
 
     return this._prisma.addressBook.delete({
       where: {
         id,
+        userId: userId,
       },
       select: this.getSelectedProperties(),
     });

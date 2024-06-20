@@ -62,18 +62,18 @@ export class AddressBookController {
     };
   }
 
-  // @MessagePattern({
-  //   cmd: 'delete_user_profile',
-  // })
-  // async deleteUserProfile(id: number): Promise<{
-  //   success: boolean;
-  //   data: any;
-  // }> {
-  //   const user = await this._userProfileService.delete(id);
+  @MessagePattern({
+    cmd: 'delete_address_book',
+  })
+  async deleteUserProfile(data: { id: number; userId: number }): Promise<{
+    success: boolean;
+    data: IAddressBook;
+  }> {
+    const user = await this._addressBookService.delete(data.id, data.userId);
 
-  //   return {
-  //     success: true,
-  //     data: user,
-  //   };
-  // }
+    return {
+      success: true,
+      data: user,
+    };
+  }
 }

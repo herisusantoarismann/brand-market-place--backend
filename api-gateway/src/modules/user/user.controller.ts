@@ -130,19 +130,22 @@ export class UserController {
       );
   }
 
-  // @Delete('/:id')
-  // delete(@Param('id') id: string): Observable<any> {
-  //   return this._userService
-  //     .send(
-  //       {
-  //         cmd: 'delete_user_profile',
-  //       },
-  //       Number(id),
-  //     )
-  //     .pipe(
-  //       catchError((error) =>
-  //         throwError(() => new RpcException(error.response)),
-  //       ),
-  //     );
-  // }
+  @Delete('/:userId/address-book/:id')
+  deleteAddressBook(
+    @Param('id') id: string,
+    @Param('userId') userId: string,
+  ): Observable<any> {
+    return this._userService
+      .send(
+        {
+          cmd: 'delete_address_book',
+        },
+        { id: +id, userId: +userId },
+      )
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
 }
