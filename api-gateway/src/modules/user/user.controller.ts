@@ -12,6 +12,7 @@ import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { Observable, catchError, throwError } from 'rxjs';
 import { CreateUserProfileDto } from './dto/create-user-profile.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
+import { CreateAddressBookDto } from './dto/create-address-book.dto';
 
 @Controller('users')
 export class UserController {
@@ -79,4 +80,67 @@ export class UserController {
         ),
       );
   }
+
+  @Get('/:id/address-books')
+  findAllAddressBooks(@Param('id') id: string): Observable<any> {
+    return this._userService
+      .send({ cmd: 'find_all_address_book' }, +id)
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  @Post('/:id/address-book')
+  createUserAddressBook(
+    @Param('id') id: string,
+    @Body() createAddressBookDto: CreateAddressBookDto,
+  ): Observable<any> {
+    return this._userService
+      .send(
+        { cmd: 'create_address_book' },
+        { id: +id, data: createAddressBookDto },
+      )
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  // @Put('/:id')
+  // update(
+  //   @Param('id') id: string,
+  //   @Body() updateUserProfileDto: UpdateUserProfileDto,
+  // ): Observable<any> {
+  //   return this._userService
+  //     .send(
+  //       {
+  //         cmd: 'update_user_profile',
+  //       },
+  //       { id: Number(id), data: updateUserProfileDto },
+  //     )
+  //     .pipe(
+  //       catchError((error) =>
+  //         throwError(() => new RpcException(error.response)),
+  //       ),
+  //     );
+  // }
+
+  // @Delete('/:id')
+  // delete(@Param('id') id: string): Observable<any> {
+  //   return this._userService
+  //     .send(
+  //       {
+  //         cmd: 'delete_user_profile',
+  //       },
+  //       Number(id),
+  //     )
+  //     .pipe(
+  //       catchError((error) =>
+  //         throwError(() => new RpcException(error.response)),
+  //       ),
+  //     );
+  // }
 }

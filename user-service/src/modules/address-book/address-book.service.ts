@@ -22,6 +22,16 @@ export class AddressBookService {
     };
   }
 
+  async findAll(id: number): Promise<IAddressBook[]> {
+    console.log(id);
+    return this._prisma.addressBook.findMany({
+      where: {
+        userId: id,
+      },
+      select: this.getSelectedProperties(),
+    });
+  }
+
   async create(
     createAddressBookDto: CreateAddressBookDto,
   ): Promise<IAddressBook> {
