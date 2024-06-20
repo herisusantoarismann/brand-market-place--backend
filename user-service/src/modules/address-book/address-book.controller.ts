@@ -3,6 +3,7 @@ import { MessagePattern } from '@nestjs/microservices';
 import { AddressBookService } from './address-book.service';
 import { CreateAddressBookDto } from './dto/create-address-book.dto';
 import { IAddressBook } from 'src/shared/interfaces/address-book.interface';
+import { UpdateAddressBookDto } from './dto/update-address-book.dto';
 
 @Controller('address-book')
 export class AddressBookController {
@@ -40,21 +41,26 @@ export class AddressBookController {
     };
   }
 
-  // @MessagePattern({ cmd: 'update_user_profile' })
-  // async updateUserProfile(data: {
-  //   id: number;
-  //   data: UpdateUserProfileDto;
-  // }): Promise<{
-  //   success: boolean;
-  //   data: any;
-  // }> {
-  //   const user = await this._userProfileService.update(data.id, data.data);
+  @MessagePattern({ cmd: 'update_address_book' })
+  async updateAddressBook(data: {
+    id: number;
+    userId: number;
+    data: UpdateAddressBookDto;
+  }): Promise<{
+    success: boolean;
+    data: IAddressBook;
+  }> {
+    const addressBook = await this._addressBookService.update(
+      data.id,
+      data.userId,
+      data.data,
+    );
 
-  //   return {
-  //     success: true,
-  //     data: user,
-  //   };
-  // }
+    return {
+      success: true,
+      data: addressBook,
+    };
+  }
 
   // @MessagePattern({
   //   cmd: 'delete_user_profile',

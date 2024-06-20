@@ -13,6 +13,7 @@ import { Observable, catchError, throwError } from 'rxjs';
 import { CreateUserProfileDto } from './dto/create-user-profile.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { CreateAddressBookDto } from './dto/create-address-book.dto';
+import { UpdateAddressBookDto } from './dto/update-address-book.dto';
 
 @Controller('users')
 export class UserController {
@@ -109,24 +110,25 @@ export class UserController {
       );
   }
 
-  // @Put('/:id')
-  // update(
-  //   @Param('id') id: string,
-  //   @Body() updateUserProfileDto: UpdateUserProfileDto,
-  // ): Observable<any> {
-  //   return this._userService
-  //     .send(
-  //       {
-  //         cmd: 'update_user_profile',
-  //       },
-  //       { id: Number(id), data: updateUserProfileDto },
-  //     )
-  //     .pipe(
-  //       catchError((error) =>
-  //         throwError(() => new RpcException(error.response)),
-  //       ),
-  //     );
-  // }
+  @Put('/:userId/address-book/:id')
+  updateAddressBook(
+    @Param('id') id: string,
+    @Param('userId') userId: string,
+    @Body() updateAddressBookDto: UpdateAddressBookDto,
+  ): Observable<any> {
+    return this._userService
+      .send(
+        {
+          cmd: 'update_address_book',
+        },
+        { id: Number(id), userId: +userId, data: updateAddressBookDto },
+      )
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
 
   // @Delete('/:id')
   // delete(@Param('id') id: string): Observable<any> {

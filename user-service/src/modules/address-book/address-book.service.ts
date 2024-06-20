@@ -50,7 +50,11 @@ export class AddressBookService {
     });
   }
 
-  async update(id: number, data: UpdateAddressBookDto): Promise<IAddressBook> {
+  async update(
+    id: number,
+    userId: number,
+    data: UpdateAddressBookDto,
+  ): Promise<IAddressBook> {
     const addressBook = await this.findById(id);
 
     if (!addressBook) {
@@ -60,6 +64,7 @@ export class AddressBookService {
     return this._prisma.addressBook.update({
       where: {
         id,
+        userId: userId,
       },
       data,
       select: this.getSelectedProperties(),
