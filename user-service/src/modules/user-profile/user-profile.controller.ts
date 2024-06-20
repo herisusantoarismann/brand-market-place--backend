@@ -22,6 +22,19 @@ export class UserProfileController {
     };
   }
 
+  @MessagePattern({ cmd: 'find_user_profile' })
+  async find(id: number): Promise<{
+    success: boolean;
+    data: IUserProfile;
+  }> {
+    const users = await this._userProfileService.findById(id);
+
+    return {
+      success: true,
+      data: users,
+    };
+  }
+
   @MessagePattern({ cmd: 'create_user_profile' })
   async createUserProfile(createUserProfileDto: CreateUserProfileDto): Promise<{
     success: boolean;

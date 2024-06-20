@@ -29,6 +29,7 @@ model UserProfile {
 // Definisi model untuk addressBook
 model AddressBook {
   id             Int      @id @default(autoincrement())
+  userId         Int      
   userProfile    UserProfile @relation(fields: [userProfileId], references: [id])
   userProfileId  Int
   type           String   

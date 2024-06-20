@@ -22,6 +22,16 @@ export class AddressBookService {
     };
   }
 
+  async findAll(id: number): Promise<IAddressBook[]> {
+    console.log(id);
+    return this._prisma.addressBook.findMany({
+      where: {
+        userId: id,
+      },
+      select: this.getSelectedProperties(),
+    });
+  }
+
   async create(
     createAddressBookDto: CreateAddressBookDto,
   ): Promise<IAddressBook> {
@@ -40,7 +50,11 @@ export class AddressBookService {
     });
   }
 
-  async update(id: number, data: UpdateAddressBookDto): Promise<IAddressBook> {
+  async update(
+    id: number,
+    userId: number,
+    data: UpdateAddressBookDto,
+  ): Promise<IAddressBook> {
     const addressBook = await this.findById(id);
 
     if (!addressBook) {
@@ -50,22 +64,24 @@ export class AddressBookService {
     return this._prisma.addressBook.update({
       where: {
         id,
+        userId: userId,
       },
       data,
       select: this.getSelectedProperties(),
     });
   }
 
-  async delete(id: number): Promise<IAddressBook> {
+  async delete(id: number, userId: number): Promise<IAddressBook> {
     const addressBook = await this.findById(id);
 
     if (!addressBook) {
-      throw new RpcException(new BadRequestException('User Not Found'));
+      throw new RpcException(new BadRequestException('Address Book Not Found'));
     }
 
     return this._prisma.addressBook.delete({
       where: {
         id,
+        userId: userId,
       },
       select: this.getSelectedProperties(),
     });
