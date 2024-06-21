@@ -1,9 +1,15 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { IProduct } from 'src/shared/interfaces/product.interface';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { RpcException } from '@nestjs/microservices';
+import path from 'path';
+import { IProductImage } from 'src/shared/interfaces/product-image.interface';
 
 @Injectable()
 export class ProductsService {
@@ -84,5 +90,31 @@ export class ProductsService {
       },
       select: this.getSelectedProperties(),
     });
+  }
+
+  async uploadFile(
+    productId: number,
+    file: Express.Multer.File,
+  ): Promise<IProductImage> {
+    if (!file) {
+      throw new RpcException(new NotFoundException('No file uploaded'));
+    }
+
+    const savedFile = await this._prisma.productImage.create({
+      data: {
+        url: '/uploads/profile-pic/' + file.filename,
+        product: { connect: { id: productId } },
+      },
+      select: {
+        id: true,
+        url: true,
+      },
+    });
+
+    if (!savedFile) {
+      throw new RpcException(new NotFoundException('File failed to upload'));
+    }
+
+    return savedFile;
   }
 }
