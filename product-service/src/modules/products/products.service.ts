@@ -92,18 +92,14 @@ export class ProductsService {
     });
   }
 
-  async uploadFile(
-    productId: number,
-    file: Express.Multer.File,
-  ): Promise<IProductImage> {
+  async uploadFile(file: Express.Multer.File): Promise<IProductImage> {
     if (!file) {
       throw new RpcException(new NotFoundException('No file uploaded'));
     }
 
     const savedFile = await this._prisma.productImage.create({
       data: {
-        url: '/uploads/profile-pic/' + file.filename,
-        product: { connect: { id: productId } },
+        url: '/uploads/products/' + file.filename,
       },
       select: {
         id: true,

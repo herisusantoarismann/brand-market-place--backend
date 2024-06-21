@@ -85,8 +85,8 @@ model BrandImage{
 model ProductImage {
   id        Int      @id @default(autoincrement())
   url       String
-  productId Int
-  product   Product  @relation(fields: [productId], references: [id])
+  productId Int?
+  product   Product?  @relation(fields: [productId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
