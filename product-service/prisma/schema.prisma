@@ -24,12 +24,22 @@ model Brand{
   @@map("brands")
 }
 
+model Category{
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("categories")
+}
+
 model Product {
   id           Int            @id @default(autoincrement())
   name         String
   description  String
   price        Float
-  sizes        Size[]
+  sizes        Json
   reviews      Review[]
   images       ProductImage[]
   wishlists    Wishlist[]
@@ -39,23 +49,24 @@ model Product {
   @@map("products")
 }
 
-model Size {
-  id        Int      @id @default(autoincrement())
-  value     Float
-  productId Int 
-  product   Product  @relation(fields: [productId], references: [id])
+model Gender{
+  id           Int            @id @default(autoincrement())
+  name         String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 
-  @@map("sizes")
+  @@map("gender")
 }
 
 model Review {
   id        Int      @id @default(autoincrement())
-  author    String
+  userId    Int
   content   String
   rating    Float
   productId Int
   product   Product  @relation(fields: [productId], references: [id])
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("reviews")
 }
@@ -64,7 +75,9 @@ model BrandImage{
   id        Int      @id @default(autoincrement())
   url       String
   brandId   Int
-  brand     Brand  @relation(fields: [brandId], references: [id])
+  brand     Brand    @relation(fields: [brandId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("brand_image")
 }
@@ -74,6 +87,8 @@ model ProductImage {
   url       String
   productId Int
   product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("product_image")
 }
@@ -84,6 +99,7 @@ model Wishlist {
   productId Int
   product   Product  @relation(fields: [productId], references: [id])
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("whislists")
 }
