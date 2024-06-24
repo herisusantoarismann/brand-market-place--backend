@@ -5,10 +5,10 @@ import { IWishlist } from './wishlist.interface';
 export interface IProduct {
   id: number;
   name: string;
-  description: string;
+  description?: string;
   price: number;
-  sizes: any;
-  reviews: IReview[];
+  sizes?: any;
+  reviews?: IReview[];
   images: IProductImage[];
   wishlists?: IWishlist;
 }

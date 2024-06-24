@@ -118,5 +118,5 @@ model Wishlist {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("whislists")
+  @@map("wishlists")
 }

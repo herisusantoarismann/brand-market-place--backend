@@ -9,9 +9,10 @@ import { UserModule } from './modules/user/user.module';
 import { ProductModule } from './modules/product/product.module';
 import { BrandsModule } from './modules/brands/brands.module';
 import { CategoriesModule } from './modules/categories/categories.module';
+import { WishlistsModule } from './modules/wishlists/wishlists.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), AuthModule, UserModule, ProductModule, BrandsModule, CategoriesModule],
+  imports: [ConfigModule.forRoot(), AuthModule, UserModule, ProductModule, BrandsModule, CategoriesModule, WishlistsModule],
   controllers: [AppController],
   providers: [
     AppService,
