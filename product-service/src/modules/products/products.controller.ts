@@ -1,8 +1,11 @@
 import {
   Controller,
+  Header,
   HttpStatus,
   ParseFilePipeBuilder,
   Req,
+  Res,
+  StreamableFile,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -16,7 +19,11 @@ import multer, { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import { IProductImage } from 'src/shared/interfaces/product-image.interface';
 import * as path from 'path';
-import { writeFile } from 'fs';
+import { createReadStream, writeFile } from 'fs';
+import { Response } from 'express';
+import { join } from 'path';
+import { S3Client } from '@aws-sdk/client-s3';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('products')
 export class ProductsController {
@@ -46,6 +53,12 @@ export class ProductsController {
       success: true,
       data: product,
     };
+  }
+
+  @MessagePattern({ cmd: 'find_product_by_name' })
+  async findByName(@Payload() name: string): Promise<string> {
+    const imagePath = await this._productService.findByName(name);
+    return imagePath;
   }
 
   @MessagePattern({ cmd: 'create_product' })
@@ -96,16 +109,18 @@ export class ProductsController {
     cmd: 'upload_product_image',
   })
   async uploadFile(
-    @Payload() payload: any,
+    @Payload()
+    payload: {
+      metadata: {
+        filename: string;
+        mimetype: string;
+      };
+      fileBase64: string;
+    },
   ): Promise<{ success: Boolean; data: any }> {
     const { metadata, fileBase64 } = payload;
-    const { filename, originalname, mimetype } = metadata;
     const fileBuffer = Buffer.from(fileBase64, 'base64');
-
-    const savePath = path.join('./uploads/products', filename);
-    const file = await this._productService.uploadFile(metadata);
-
-    writeFile(savePath, fileBuffer, () => {});
+    const file = await this._productService.uploadFile(metadata, fileBuffer);
 
     return {
       success: true,

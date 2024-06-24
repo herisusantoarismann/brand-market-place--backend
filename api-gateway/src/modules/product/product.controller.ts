@@ -2,11 +2,13 @@ import {
   Body,
   Controller,
   Get,
+  Header,
   HttpStatus,
   Inject,
   Param,
   ParseFilePipeBuilder,
   Post,
+  Res,
   StreamableFile,
   UploadedFile,
   UseInterceptors,
@@ -15,7 +17,7 @@ import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import * as path from 'path';
-import { Observable, catchError, throwError } from 'rxjs';
+import { Observable, catchError, of, switchMap, tap, throwError } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import * as fs from 'fs';
 
@@ -50,6 +52,17 @@ export class ProductController {
   //       ),
   //     );
   // }
+
+  @Get('/product/images/:productName')
+  findByName(@Param('productName') productName: string): any {
+    return this._productService
+      .send({ cmd: 'find_product_by_name' }, productName)
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
 
   // @Post('/')
   // create(@Body() createUserProfileDto: Create): Observable<any> {
@@ -136,16 +149,13 @@ export class ProductController {
   ): Promise<any> {
     const metadata = {
       filename: file.filename,
-      originalname: file.originalname,
       destination: './uploads/products',
       mimetype: file.mimetype,
     };
 
-    // Baca file sebagai buffer
     const filePath = path.join(metadata.destination, file.filename);
     const fileBuffer = await fs.promises.readFile(filePath);
 
-    // Encode buffer ke base64
     const fileBase64 = fileBuffer.toString('base64');
 
     const result = this._productService

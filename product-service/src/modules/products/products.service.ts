@@ -8,12 +8,33 @@ import { IProduct } from 'src/shared/interfaces/product.interface';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { RpcException } from '@nestjs/microservices';
-import path from 'path';
+import * as path from 'path';
 import { IProductImage } from 'src/shared/interfaces/product-image.interface';
+import * as fs from 'fs';
+import { ConfigService } from '@nestjs/config';
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 @Injectable()
 export class ProductsService {
-  constructor(private readonly _prisma: PrismaService) {}
+  private s3Client: S3Client;
+  private cloudFrontUrl: string;
+
+  constructor(
+    private readonly _prisma: PrismaService,
+    private readonly configService: ConfigService,
+  ) {
+    this.s3Client = new S3Client({
+      region: this.configService.get<string>('AWS_REGION'),
+      credentials: {
+        accessKeyId: this.configService.get<string>('AWS_ACCESS_KEY_ID'),
+        secretAccessKey: this.configService.get<string>(
+          'AWS_SECRET_ACCESS_KEY',
+        ),
+      },
+    });
+
+    this.cloudFrontUrl = this.configService.get<string>('CLOUDFRONT_URL');
+  }
 
   getSelectedProperties() {
     return {
@@ -61,6 +82,25 @@ export class ProductsService {
     });
   }
 
+  async findByName(name: string): Promise<string> {
+    const product = await this._prisma.productImage.findFirst({
+      where: {
+        name,
+      },
+      select: {
+        id: true,
+        name: true,
+        url: true,
+      },
+    });
+
+    if (!product) {
+      throw new RpcException(new NotFoundException('Image Not Found'));
+    }
+
+    return product.url;
+  }
+
   async update(id: number, data: UpdateProductDto): Promise<IProduct> {
     const userProfile = await this.findById(id);
 
@@ -92,17 +132,38 @@ export class ProductsService {
     });
   }
 
-  async uploadFile(file: Express.Multer.File): Promise<IProductImage> {
-    if (!file) {
+  async uploadFile(
+    metadata: {
+      filename: string;
+      mimetype: string;
+    },
+    fileBuffer: Buffer,
+  ): Promise<IProductImage> {
+    if (!fileBuffer) {
       throw new RpcException(new NotFoundException('No file uploaded'));
     }
 
+    const bucketName = this.configService.get<string>(
+      'AWS_S3_PRODUCT_BUCKET_NAME',
+    );
+    const uploadParams = {
+      Bucket: bucketName,
+      Key: metadata.filename,
+      Body: fileBuffer,
+      ContentType: metadata.mimetype,
+    };
+
+    const command = new PutObjectCommand(uploadParams);
+    await this.s3Client.send(command);
+
     const savedFile = await this._prisma.productImage.create({
       data: {
-        url: '/uploads/products/' + file.filename,
+        name: metadata.filename,
+        url: `${this.cloudFrontUrl}/${metadata.filename}`,
       },
       select: {
         id: true,
+        name: true,
         url: true,
       },
     });
