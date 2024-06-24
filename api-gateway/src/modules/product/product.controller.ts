@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Header,
   HttpStatus,
@@ -97,21 +98,21 @@ export class ProductController {
       );
   }
 
-  // @Delete('/:id')
-  // delete(@Param('id') id: string): Observable<any> {
-  //   return this._userService
-  //     .send(
-  //       {
-  //         cmd: 'delete_user_profile',
-  //       },
-  //       Number(id),
-  //     )
-  //     .pipe(
-  //       catchError((error) =>
-  //         throwError(() => new RpcException(error.response)),
-  //       ),
-  //     );
-  // }
+  @Delete('product/:id')
+  delete(@Param('id') id: string): Observable<any> {
+    return this._productService
+      .send(
+        {
+          cmd: 'delete_product',
+        },
+        Number(id),
+      )
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
 
   @Post('/product/upload')
   @UseInterceptors(
