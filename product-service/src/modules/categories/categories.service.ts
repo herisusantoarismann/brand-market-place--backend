@@ -47,6 +47,19 @@ export class CategoriesService {
     };
   }
 
+  async findAll(): Promise<ICategory[]> {
+    const categories = await this._prisma.category.findMany({
+      select: this.getSelectedProperties(),
+    });
+
+    return categories.map((item) => {
+      return {
+        ...item,
+        image: item.image[0] ?? null,
+      };
+    });
+  }
+
   async create(createCategoryDto: CreateCategoryDto): Promise<ICategory> {
     const category = await this._prisma.category.create({
       data: {

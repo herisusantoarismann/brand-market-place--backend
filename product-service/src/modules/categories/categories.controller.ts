@@ -8,6 +8,19 @@ import { ICategory } from 'src/shared/interfaces/category.interface';
 export class CategoriesController {
   constructor(private readonly _categoryService: CategoriesService) {}
 
+  @MessagePattern({ cmd: 'find_all_categories' })
+  async findAll(): Promise<{
+    success: boolean;
+    data: ICategory[];
+  }> {
+    const categories = await this._categoryService.findAll();
+
+    return {
+      success: true,
+      data: categories,
+    };
+  }
+
   @MessagePattern({ cmd: 'create_category' })
   async createBrand(createCategoryDto: CreateCategoryDto): Promise<{
     success: boolean;

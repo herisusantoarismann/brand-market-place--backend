@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpStatus,
   Inject,
   ParseFilePipeBuilder,
@@ -22,6 +23,17 @@ export class CategoriesController {
   constructor(
     @Inject('PRODUCT_SERVICE') private readonly _productService: ClientProxy,
   ) {}
+
+  @Get('/categories')
+  findAll(): Observable<any> {
+    return this._productService
+      .send({ cmd: 'find_all_categories' }, '')
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
 
   @Post('/category')
   create(@Body() createCategoryDto: CreateCategoryDto): Observable<any> {
