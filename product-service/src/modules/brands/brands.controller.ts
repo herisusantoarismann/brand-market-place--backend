@@ -8,6 +8,19 @@ import { IBrand } from 'src/shared/interfaces/brand.interface';
 export class BrandsController {
   constructor(private readonly _brandsService: BrandsService) {}
 
+  @MessagePattern({ cmd: 'find_all_brands' })
+  async findAll(): Promise<{
+    success: boolean;
+    data: IBrand[];
+  }> {
+    const products = await this._brandsService.findAll();
+
+    return {
+      success: true,
+      data: products,
+    };
+  }
+
   @MessagePattern({ cmd: 'create_brand' })
   async createUserProfile(createBrandDto: CreateBrandDto): Promise<{
     success: boolean;

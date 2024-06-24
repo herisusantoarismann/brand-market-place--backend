@@ -33,6 +33,7 @@ export class BrandsService {
     return {
       id: true,
       name: true,
+      description: true,
       image: {
         select: {
           id: true,
@@ -43,17 +44,37 @@ export class BrandsService {
     };
   }
 
+  async findAll(): Promise<IBrand[]> {
+    const brands = await this._prisma.brand.findMany({
+      select: this.getSelectedProperties(),
+    });
+
+    return brands.map((item) => {
+      return {
+        ...item,
+        image: item.image[0] ?? null,
+      };
+    });
+  }
+
   async create(createBrandDto: CreateBrandDto): Promise<IBrand> {
-    return this._prisma.brand.create({
+    const brand = await this._prisma.brand.create({
       data: {
         name: createBrandDto.name,
         description: createBrandDto.description,
         image: {
-          connect: createBrandDto.imageIds.map((id) => ({ id })),
+          connect: {
+            id: createBrandDto.imageId,
+          },
         },
       },
       select: this.getSelectedProperties(),
     });
+
+    return {
+      ...brand,
+      image: brand.image[0],
+    };
   }
 
   async uploadFile(

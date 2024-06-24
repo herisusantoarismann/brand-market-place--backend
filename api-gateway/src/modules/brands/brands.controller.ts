@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpStatus,
   Inject,
   ParseFilePipeBuilder,
@@ -22,6 +23,17 @@ export class BrandsController {
   constructor(
     @Inject('PRODUCT_SERVICE') private readonly _productService: ClientProxy,
   ) {}
+
+  @Get('/brands')
+  findAll(): Observable<any> {
+    return this._productService
+      .send({ cmd: 'find_all_brands' }, '')
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
 
   @Post('/brand')
   create(@Body() createBrand: CreateBrandDto): Observable<any> {

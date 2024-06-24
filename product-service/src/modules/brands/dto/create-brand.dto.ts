@@ -8,8 +8,7 @@ export class CreateBrandDto {
   @IsString()
   description?: string;
 
-  @IsArray()
   @IsNotEmpty()
-  @IsNumber({}, { each: true })
-  imageIds: number[];
+  @IsNumber()
+  imageId: number;
 }
