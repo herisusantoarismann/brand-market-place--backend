@@ -20,6 +20,7 @@ import * as path from 'path';
 import { Observable, catchError, of, switchMap, tap, throwError } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import * as fs from 'fs';
+import { CreateProductDto } from './dto/create-product.dto';
 
 @Controller('/')
 export class ProductController {
@@ -64,16 +65,16 @@ export class ProductController {
       );
   }
 
-  // @Post('/')
-  // create(@Body() createUserProfileDto: Create): Observable<any> {
-  //   return this._userService
-  //     .send({ cmd: 'create_user_profile' }, createUserProfileDto)
-  //     .pipe(
-  //       catchError((error) =>
-  //         throwError(() => new RpcException(error.response)),
-  //       ),
-  //     );
-  // }
+  @Post('/product')
+  create(@Body() createProduct: CreateProductDto): Observable<any> {
+    return this._productService
+      .send({ cmd: 'create_product' }, createProduct)
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
 
   // @Put('/:id')
   // update(

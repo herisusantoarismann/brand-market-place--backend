@@ -46,6 +46,7 @@ export class ProductsService {
       images: {
         select: {
           id: true,
+          name: true,
           url: true,
         },
       },
@@ -68,7 +69,15 @@ export class ProductsService {
 
   async create(createProductDto: CreateProductDto): Promise<IProduct> {
     return this._prisma.product.create({
-      data: createProductDto,
+      data: {
+        name: createProductDto.name,
+        description: createProductDto.description,
+        price: createProductDto.price,
+        sizes: createProductDto.sizes,
+        images: {
+          connect: createProductDto.imageIds.map((id) => ({ id })),
+        },
+      },
       select: this.getSelectedProperties(),
     });
   }
@@ -112,7 +121,12 @@ export class ProductsService {
       where: {
         id,
       },
-      data,
+      data: {
+        ...data,
+        images: {
+          connect: data.imageIds.map((id) => ({ id })),
+        },
+      },
       select: this.getSelectedProperties(),
     });
   }
