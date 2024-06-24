@@ -15,7 +15,6 @@ export class WishlistsService {
   getSelectedProperties() {
     return {
       id: true,
-      userId: true,
       product: {
         select: {
           id: true,
@@ -32,19 +31,22 @@ export class WishlistsService {
     };
   }
 
-  async getUser(
-    userId: number,
-  ): Promise<{ id: number; name: string; email: string }> {
-    const result = this._authService.send({ cmd: 'get_auth_detail' }, +userId);
-    return lastValueFrom(result);
+  async findAll(userId: number): Promise<IWishlist[]> {
+    return this._prisma.wishlist.findMany({
+      where: {
+        userId,
+      },
+      select: this.getSelectedProperties(),
+    });
   }
 
-  async create(createWishlistDto: CreateWishlistDto): Promise<IWishlist> {
-    const user = await this.getUser(+createWishlistDto.userId);
-
-    const wishlist = await this._prisma.wishlist.create({
+  async create(
+    userId: number,
+    createWishlistDto: CreateWishlistDto,
+  ): Promise<IWishlist> {
+    return this._prisma.wishlist.create({
       data: {
-        userId: createWishlistDto.userId,
+        userId,
         product: {
           connect: {
             id: createWishlistDto.productId,
@@ -53,11 +55,5 @@ export class WishlistsService {
       },
       select: this.getSelectedProperties(),
     });
-
-    return {
-      id: wishlist.id,
-      user: user,
-      product: wishlist.product,
-    };
   }
 }
