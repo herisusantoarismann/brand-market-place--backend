@@ -8,9 +8,10 @@ import { ValidationErrorsInterceptor } from './shared/exceptions/validation.exce
 import { UserModule } from './modules/user/user.module';
 import { ProductModule } from './modules/product/product.module';
 import { BrandsModule } from './modules/brands/brands.module';
+import { CategoriesModule } from './modules/categories/categories.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), AuthModule, UserModule, ProductModule, BrandsModule],
+  imports: [ConfigModule.forRoot(), AuthModule, UserModule, ProductModule, BrandsModule, CategoriesModule],
   controllers: [AppController],
   providers: [
     AppService,

@@ -9,6 +9,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ConfigModule } from '@nestjs/config';
 import { BrandsModule } from './modules/brands/brands.module';
+import { CategoriesModule } from './modules/categories/categories.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { BrandsModule } from './modules/brands/brands.module';
     }),
     ConfigModule.forRoot(),
     BrandsModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService, ProductsService, PrismaService],
