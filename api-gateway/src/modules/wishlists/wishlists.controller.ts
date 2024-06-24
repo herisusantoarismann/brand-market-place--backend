@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Inject,
+  Param,
+  Post,
+} from '@nestjs/common';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { Observable, catchError, throwError } from 'rxjs';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
@@ -44,6 +52,25 @@ export class WishlistsController {
   ): Observable<any> {
     return this._productService
       .send({ cmd: 'create_wishlist' }, { userId: +userId, createWishlistDto })
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  @Delete('/product/:userId/wishlist/:id')
+  delete(
+    @Param('userId') userId: string,
+    @Param('id') id: string,
+  ): Observable<any> {
+    return this._productService
+      .send(
+        {
+          cmd: 'delete_wishlist',
+        },
+        { userId: +userId, id: +id },
+      )
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),

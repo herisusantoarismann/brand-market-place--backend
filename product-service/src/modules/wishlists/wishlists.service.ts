@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { IWishlist } from 'src/shared/interfaces/wishlist.interface';
 import { PrismaService } from 'src/prisma.service';
@@ -89,6 +94,22 @@ export class WishlistsService {
             id: createWishlistDto.productId,
           },
         },
+      },
+      select: this.getSelectedProperties(),
+    });
+  }
+
+  async delete(userId: number, id: number): Promise<IWishlist> {
+    const wishlist = await this.findById(userId, id);
+
+    if (!wishlist) {
+      throw new RpcException(new BadRequestException('Product Not Found'));
+    }
+
+    return this._prisma.wishlist.delete({
+      where: {
+        id,
+        userId,
       },
       select: this.getSelectedProperties(),
     });

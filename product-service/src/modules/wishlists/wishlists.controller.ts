@@ -59,4 +59,23 @@ export class WishlistsController {
       data: wishlist,
     };
   }
+
+  @MessagePattern({
+    cmd: 'delete_wishlist',
+  })
+  async deleteUserProfile(
+    @Payload() payload: { userId: number; id: number },
+  ): Promise<{
+    success: boolean;
+    data: IWishlist;
+  }> {
+    const { userId, id } = payload;
+
+    const product = await this._wishlistService.delete(userId, id);
+
+    return {
+      success: true,
+      data: product,
+    };
+  }
 }
