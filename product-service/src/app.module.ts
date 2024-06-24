@@ -8,6 +8,7 @@ import { PrismaService } from './prisma.service';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ConfigModule } from '@nestjs/config';
+import { BrandsModule } from './modules/brands/brands.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ConfigModule } from '@nestjs/config';
       rootPath: join(__dirname, '..', 'uploads'),
     }),
     ConfigModule.forRoot(),
+    BrandsModule,
   ],
   controllers: [AppController],
   providers: [AppService, ProductsService, PrismaService],

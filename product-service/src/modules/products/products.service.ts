@@ -33,7 +33,9 @@ export class ProductsService {
       },
     });
 
-    this.cloudFrontUrl = this.configService.get<string>('CLOUDFRONT_URL');
+    this.cloudFrontUrl = this.configService.get<string>(
+      'CLOUDFRONT_PRODUCT_URL',
+    );
   }
 
   getSelectedProperties() {
