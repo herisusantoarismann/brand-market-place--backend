@@ -3,6 +3,7 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 import { BrandsService } from './brands.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { IBrand } from 'src/shared/interfaces/brand.interface';
+import { UpdateBrandDto } from './dto/update-brand.dto';
 
 @Controller('brands')
 export class BrandsController {
@@ -35,11 +36,24 @@ export class BrandsController {
   }
 
   @MessagePattern({ cmd: 'create_brand' })
-  async createUserProfile(createBrandDto: CreateBrandDto): Promise<{
+  async createBrand(createBrandDto: CreateBrandDto): Promise<{
     success: boolean;
     data: IBrand;
   }> {
     const brand = await this._brandsService.create(createBrandDto);
+
+    return {
+      success: true,
+      data: brand,
+    };
+  }
+
+  @MessagePattern({ cmd: 'update_brand' })
+  async updateBrand(data: { id: number; data: UpdateBrandDto }): Promise<{
+    success: boolean;
+    data: IBrand;
+  }> {
+    const brand = await this._brandsService.update(data.id, data.data);
 
     return {
       success: true,

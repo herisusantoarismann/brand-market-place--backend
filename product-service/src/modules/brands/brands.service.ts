@@ -1,11 +1,16 @@
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
 import { PrismaService } from 'src/prisma.service';
 import { IBrandImage } from 'src/shared/interfaces/brand-image.interface';
 import { IBrand } from 'src/shared/interfaces/brand.interface';
 import { CreateBrandDto } from './dto/create-brand.dto';
+import { UpdateBrandDto } from './dto/update-brand.dto';
 
 @Injectable()
 export class BrandsService {
@@ -88,6 +93,35 @@ export class BrandsService {
     return {
       ...brand,
       image: brand.image[0] ?? null,
+    };
+  }
+
+  async update(id: number, data: UpdateBrandDto): Promise<IBrand> {
+    const brand = await this.findById(id);
+
+    if (!brand) {
+      throw new RpcException(new BadRequestException('Brand Not Found'));
+    }
+
+    const newBrand = await this._prisma.brand.update({
+      where: {
+        id,
+      },
+      data: {
+        name: data.name,
+        description: data.description,
+        image: {
+          connect: {
+            id: data.imageId,
+          },
+        },
+      },
+      select: this.getSelectedProperties(),
+    });
+
+    return {
+      ...newBrand,
+      image: newBrand.image[0] ?? null,
     };
   }
 

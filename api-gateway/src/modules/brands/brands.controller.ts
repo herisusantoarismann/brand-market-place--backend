@@ -7,6 +7,7 @@ import {
   Param,
   ParseFilePipeBuilder,
   Post,
+  Put,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -18,6 +19,7 @@ import * as fs from 'fs';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { Observable, catchError, throwError } from 'rxjs';
 import { CreateBrandDto } from './dto/create-brand.dto';
+import { UpdateBrandDto } from './dto/update-brand.dto';
 
 @Controller('/')
 export class BrandsController {
@@ -51,6 +53,25 @@ export class BrandsController {
   create(@Body() createBrand: CreateBrandDto): Observable<any> {
     return this._productService
       .send({ cmd: 'create_brand' }, createBrand)
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  @Put('/brand/:id')
+  update(
+    @Param('id') id: string,
+    @Body() updateBrandDto: UpdateBrandDto,
+  ): Observable<any> {
+    return this._productService
+      .send(
+        {
+          cmd: 'update_brand',
+        },
+        { id: Number(id), data: updateBrandDto },
+      )
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),
