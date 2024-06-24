@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Inject,
@@ -71,6 +72,22 @@ export class BrandsController {
           cmd: 'update_brand',
         },
         { id: Number(id), data: updateBrandDto },
+      )
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  @Delete('/brand/:id')
+  delete(@Param('id') id: string): Observable<any> {
+    return this._productService
+      .send(
+        {
+          cmd: 'delete_brand',
+        },
+        Number(id),
       )
       .pipe(
         catchError((error) =>

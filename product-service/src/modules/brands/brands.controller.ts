@@ -62,6 +62,21 @@ export class BrandsController {
   }
 
   @MessagePattern({
+    cmd: 'delete_brand',
+  })
+  async deleteUserProfile(id: number): Promise<{
+    success: boolean;
+    data: IBrand;
+  }> {
+    const brand = await this._brandsService.delete(id);
+
+    return {
+      success: true,
+      data: brand,
+    };
+  }
+
+  @MessagePattern({
     cmd: 'upload_brand_image',
   })
   async uploadFile(

@@ -125,6 +125,26 @@ export class BrandsService {
     };
   }
 
+  async delete(id: number): Promise<IBrand> {
+    const brand = await this.findById(id);
+
+    if (!brand) {
+      throw new RpcException(new BadRequestException('Brand Not Found'));
+    }
+
+    const deletedBrand = await this._prisma.brand.delete({
+      where: {
+        id,
+      },
+      select: this.getSelectedProperties(),
+    });
+
+    return {
+      ...deletedBrand,
+      image: deletedBrand.image[0] ?? null,
+    };
+  }
+
   async uploadFile(
     metadata: {
       filename: string;
