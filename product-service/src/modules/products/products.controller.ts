@@ -55,7 +55,7 @@ export class ProductsController {
     };
   }
 
-  @MessagePattern({ cmd: 'find_product_by_name' })
+  @MessagePattern({ cmd: 'find_product_image_by_name' })
   async findByName(@Payload() name: string): Promise<string> {
     const imagePath = await this._productService.findByName(name);
     return imagePath;

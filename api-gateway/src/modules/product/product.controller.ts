@@ -43,21 +43,21 @@ export class ProductController {
       );
   }
 
-  // @Get('/product/:id')
-  // find(@Param('id') userId: string): Observable<any> {
-  //   return this._productService
-  //     .send({ cmd: 'find_product' }, +userId)
-  //     .pipe(
-  //       catchError((error) =>
-  //         throwError(() => new RpcException(error.response)),
-  //       ),
-  //     );
-  // }
+  @Get('/product/:id')
+  find(@Param('id') userId: string): Observable<any> {
+    return this._productService
+      .send({ cmd: 'find_product' }, +userId)
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
 
   @Get('/product/images/:productName')
   findByName(@Param('productName') productName: string): any {
     return this._productService
-      .send({ cmd: 'find_product_by_name' }, productName)
+      .send({ cmd: 'find_product_image_by_name' }, productName)
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),
