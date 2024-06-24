@@ -35,7 +35,7 @@ export class ProductController {
   @Get('/products')
   findAll(): Observable<any> {
     return this._productService
-      .send({ cmd: 'find_all_product_service' }, '')
+      .send({ cmd: 'find_all_products' }, '')
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),
