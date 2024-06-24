@@ -3,6 +3,7 @@ import { CategoriesService } from './categories.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { ICategory } from 'src/shared/interfaces/category.interface';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Controller('categories')
 export class CategoriesController {
@@ -44,6 +45,19 @@ export class CategoriesController {
     return {
       success: true,
       data: category,
+    };
+  }
+
+  @MessagePattern({ cmd: 'update_category' })
+  async updateBrand(data: { id: number; data: UpdateCategoryDto }): Promise<{
+    success: boolean;
+    data: ICategory;
+  }> {
+    const brand = await this._categoryService.update(data.id, data.data);
+
+    return {
+      success: true,
+      data: brand,
     };
   }
 

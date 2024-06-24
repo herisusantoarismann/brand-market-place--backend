@@ -7,6 +7,7 @@ import {
   Param,
   ParseFilePipeBuilder,
   Post,
+  Put,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -18,6 +19,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { Observable, catchError, throwError } from 'rxjs';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Controller('/')
 export class CategoriesController {
@@ -51,6 +53,25 @@ export class CategoriesController {
   create(@Body() createCategoryDto: CreateCategoryDto): Observable<any> {
     return this._productService
       .send({ cmd: 'create_category' }, createCategoryDto)
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  @Put('/category/:id')
+  update(
+    @Param('id') id: string,
+    @Body() updateCategoryDto: UpdateCategoryDto,
+  ): Observable<any> {
+    return this._productService
+      .send(
+        {
+          cmd: 'update_category',
+        },
+        { id: Number(id), data: updateCategoryDto },
+      )
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),

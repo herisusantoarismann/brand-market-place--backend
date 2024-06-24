@@ -1,5 +1,6 @@
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -10,6 +11,7 @@ import { PrismaService } from 'src/prisma.service';
 import { ICategoryImage } from 'src/shared/interfaces/category-image.interface';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { ICategory } from 'src/shared/interfaces/category.interface';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Injectable()
 export class CategoriesService {
@@ -91,6 +93,36 @@ export class CategoriesService {
     return {
       ...category,
       image: category.image[0] ?? null,
+    };
+  }
+
+  async update(id: number, data: UpdateCategoryDto): Promise<ICategory> {
+    const category = await this.findById(id);
+
+    if (!category) {
+      throw new RpcException(new BadRequestException('Category Not Found'));
+    }
+
+    const newCategory = await this._prisma.category.update({
+      where: {
+        id,
+      },
+      data: {
+        name: data.name,
+        description: data.description,
+
+        image: {
+          connect: {
+            id: data.imageId,
+          },
+        },
+      },
+      select: this.getSelectedProperties(),
+    });
+
+    return {
+      ...newCategory,
+      image: newCategory.image[0] ?? null,
     };
   }
 
