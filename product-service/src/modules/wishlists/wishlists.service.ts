@@ -32,12 +32,15 @@ export class WishlistsService {
     };
   }
 
+  async getUser(
+    userId: number,
+  ): Promise<{ id: number; name: string; email: string }> {
+    const result = this._authService.send({ cmd: 'get_auth_detail' }, +userId);
+    return lastValueFrom(result);
+  }
+
   async create(createWishlistDto: CreateWishlistDto): Promise<IWishlist> {
-    const result = this._authService.send(
-      { cmd: 'get_auth_detail' },
-      +createWishlistDto.userId,
-    );
-    const user = await lastValueFrom(result);
+    const user = await this.getUser(+createWishlistDto.userId);
 
     const wishlist = await this._prisma.wishlist.create({
       data: {
