@@ -62,6 +62,21 @@ export class CategoriesController {
   }
 
   @MessagePattern({
+    cmd: 'delete_category',
+  })
+  async deleteCategory(id: number): Promise<{
+    success: boolean;
+    data: ICategory;
+  }> {
+    const category = await this._categoryService.delete(id);
+
+    return {
+      success: true,
+      data: category,
+    };
+  }
+
+  @MessagePattern({
     cmd: 'upload_category_image',
   })
   async uploadFile(

@@ -110,7 +110,6 @@ export class CategoriesService {
       data: {
         name: data.name,
         description: data.description,
-
         image: {
           connect: {
             id: data.imageId,
@@ -123,6 +122,26 @@ export class CategoriesService {
     return {
       ...newCategory,
       image: newCategory.image[0] ?? null,
+    };
+  }
+
+  async delete(id: number): Promise<ICategory> {
+    const category = await this.findById(id);
+
+    if (!category) {
+      throw new RpcException(new BadRequestException('Category Not Found'));
+    }
+
+    const deletedCategory = await this._prisma.category.delete({
+      where: {
+        id,
+      },
+      select: this.getSelectedProperties(),
+    });
+
+    return {
+      ...deletedCategory,
+      image: deletedCategory.image[0] ?? null,
     };
   }
 

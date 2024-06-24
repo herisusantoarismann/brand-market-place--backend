@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Inject,
@@ -71,6 +72,22 @@ export class CategoriesController {
           cmd: 'update_category',
         },
         { id: Number(id), data: updateCategoryDto },
+      )
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  @Delete('/category/:id')
+  delete(@Param('id') id: string): Observable<any> {
+    return this._productService
+      .send(
+        {
+          cmd: 'delete_category',
+        },
+        Number(id),
       )
       .pipe(
         catchError((error) =>
