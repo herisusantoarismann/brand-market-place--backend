@@ -1,8 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { IWishlist } from 'src/shared/interfaces/wishlist.interface';
 import { PrismaService } from 'src/prisma.service';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
 
 @Injectable()
@@ -31,7 +31,22 @@ export class WishlistsService {
     };
   }
 
+  getUser(userId: number): Promise<{
+    id: number;
+    name: string;
+    email: string;
+  }> {
+    const result = this._authService.send({ cmd: 'get_auth_detail' }, +userId);
+    return lastValueFrom(result);
+  }
+
   async findAll(userId: number): Promise<IWishlist[]> {
+    const user = await this.getUser(userId);
+
+    if (!user) {
+      throw new RpcException(new NotFoundException('User Not Found'));
+    }
+
     return this._prisma.wishlist.findMany({
       where: {
         userId,
@@ -44,6 +59,12 @@ export class WishlistsService {
     userId: number,
     createWishlistDto: CreateWishlistDto,
   ): Promise<IWishlist> {
+    const user = await this.getUser(userId);
+
+    if (!user) {
+      throw new RpcException(new NotFoundException('User Not Found'));
+    }
+
     return this._prisma.wishlist.create({
       data: {
         userId,
