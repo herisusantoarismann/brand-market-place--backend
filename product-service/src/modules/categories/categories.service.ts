@@ -60,6 +60,20 @@ export class CategoriesService {
     });
   }
 
+  async findById(id: number): Promise<ICategory> {
+    const category = await this._prisma.category.findUnique({
+      where: {
+        id,
+      },
+      select: this.getSelectedProperties(),
+    });
+
+    return {
+      ...category,
+      image: category.image[0] ?? null,
+    };
+  }
+
   async create(createCategoryDto: CreateCategoryDto): Promise<ICategory> {
     const category = await this._prisma.category.create({
       data: {

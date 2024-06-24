@@ -21,6 +21,19 @@ export class CategoriesController {
     };
   }
 
+  @MessagePattern({ cmd: 'find_category' })
+  async find(id: number): Promise<{
+    success: boolean;
+    data: ICategory;
+  }> {
+    const category = await this._categoryService.findById(id);
+
+    return {
+      success: true,
+      data: category,
+    };
+  }
+
   @MessagePattern({ cmd: 'create_category' })
   async createBrand(createCategoryDto: CreateCategoryDto): Promise<{
     success: boolean;
