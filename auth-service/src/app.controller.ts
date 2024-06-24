@@ -47,4 +47,9 @@ export class AppController {
       data: user,
     };
   }
+
+  @MessagePattern({ cmd: 'get_auth_detail' })
+  async find(userId: number): Promise<IUser> {
+    return this.appService.findById(userId);
+  }
 }

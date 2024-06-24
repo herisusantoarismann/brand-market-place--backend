@@ -25,13 +25,27 @@ model Brand{
 }
 
 model Category{
-  id          Int        @id @default(autoincrement())
-  name        String
-  description String?
+  id            Int      @id @default(autoincrement())
+  name          String
+  description   String?
+  image         CategoryImage[]
+  products      Product[]
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   @@map("categories")
+}
+
+model CategoryImage{
+  id          Int           @id @default(autoincrement())
+  name        String?       @unique
+  url         String
+  categoryId  Int?
+  category    Category?     @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("category_image")
 }
 
 model Product {
@@ -43,6 +57,7 @@ model Product {
   reviews      Review[]
   images       ProductImage[]
   wishlists    Wishlist[]
+  categories   Category[]
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
 
@@ -73,9 +88,10 @@ model Review {
 
 model BrandImage{
   id        Int      @id @default(autoincrement())
+  name      String?  @unique
   url       String
-  brandId   Int
-  brand     Brand    @relation(fields: [brandId], references: [id])
+  brandId   Int?
+  brand     Brand?    @relation(fields: [brandId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -102,5 +118,5 @@ model Wishlist {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("whislists")
+  @@map("wishlists")
 }

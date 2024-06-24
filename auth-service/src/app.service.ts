@@ -53,6 +53,19 @@ export class AppService {
     });
   }
 
+  async findById(id: number): Promise<IUser | null> {
+    return this.prisma.auth.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
+  }
+
   async login(loginDto: LoginDto): Promise<IUser> {
     const user = await this.validateUser(loginDto.email, loginDto.password);
     if (!user) {
