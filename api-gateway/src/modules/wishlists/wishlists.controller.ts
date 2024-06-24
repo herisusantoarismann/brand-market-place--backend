@@ -20,6 +20,23 @@ export class WishlistsController {
       );
   }
 
+  @Get('/product/:userId/wishlist/:id')
+  find(
+    @Param('userId') userId: string,
+    @Param('id') wishlistId: string,
+  ): Observable<any> {
+    return this._productService
+      .send(
+        { cmd: 'find_wishlist' },
+        { userId: +userId, wishlistId: +wishlistId },
+      )
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
   @Post('/product/:userId/wishlist')
   create(
     @Param('userId') userId: string,

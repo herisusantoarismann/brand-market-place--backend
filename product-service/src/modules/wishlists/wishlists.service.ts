@@ -55,6 +55,22 @@ export class WishlistsService {
     });
   }
 
+  async findById(userId: number, id: number): Promise<IWishlist> {
+    const user = await this.getUser(userId);
+
+    if (!user) {
+      throw new RpcException(new NotFoundException('User Not Found'));
+    }
+
+    return this._prisma.wishlist.findFirst({
+      where: {
+        userId,
+        id,
+      },
+      select: this.getSelectedProperties(),
+    });
+  }
+
   async create(
     userId: number,
     createWishlistDto: CreateWishlistDto,

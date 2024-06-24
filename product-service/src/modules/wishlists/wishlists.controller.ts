@@ -21,6 +21,21 @@ export class WishlistsController {
     };
   }
 
+  @MessagePattern({ cmd: 'find_wishlist' })
+  async find(@Payload() payload: { userId: number; id: number }): Promise<{
+    success: boolean;
+    data: IWishlist;
+  }> {
+    const { userId, id } = payload;
+
+    const product = await this._wishlistService.findById(userId, id);
+
+    return {
+      success: true,
+      data: product,
+    };
+  }
+
   @MessagePattern({ cmd: 'create_wishlist' })
   async createUserProfile(
     @Payload()
