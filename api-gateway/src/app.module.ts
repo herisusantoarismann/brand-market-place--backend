@@ -6,9 +6,10 @@ import { AuthModule } from './modules/auth/auth.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ValidationErrorsInterceptor } from './shared/exceptions/validation.exception';
 import { UserModule } from './modules/user/user.module';
+import { ProductModule } from './modules/product/product.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), AuthModule, UserModule],
+  imports: [ConfigModule.forRoot(), AuthModule, UserModule, ProductModule],
   controllers: [AppController],
   providers: [
     AppService,
