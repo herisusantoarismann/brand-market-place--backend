@@ -21,6 +21,19 @@ export class BrandsController {
     };
   }
 
+  @MessagePattern({ cmd: 'find_brand' })
+  async find(id: number): Promise<{
+    success: boolean;
+    data: IBrand;
+  }> {
+    const product = await this._brandsService.findById(id);
+
+    return {
+      success: true,
+      data: product,
+    };
+  }
+
   @MessagePattern({ cmd: 'create_brand' })
   async createUserProfile(createBrandDto: CreateBrandDto): Promise<{
     success: boolean;

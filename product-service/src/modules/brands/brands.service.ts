@@ -57,6 +57,20 @@ export class BrandsService {
     });
   }
 
+  async findById(id: number): Promise<IBrand> {
+    const brand = await this._prisma.brand.findUnique({
+      where: {
+        id,
+      },
+      select: this.getSelectedProperties(),
+    });
+
+    return {
+      ...brand,
+      image: brand.image[0] ?? null,
+    };
+  }
+
   async create(createBrandDto: CreateBrandDto): Promise<IBrand> {
     const brand = await this._prisma.brand.create({
       data: {
@@ -73,7 +87,7 @@ export class BrandsService {
 
     return {
       ...brand,
-      image: brand.image[0],
+      image: brand.image[0] ?? null,
     };
   }
 

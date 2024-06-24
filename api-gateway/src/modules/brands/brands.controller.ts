@@ -4,6 +4,7 @@ import {
   Get,
   HttpStatus,
   Inject,
+  Param,
   ParseFilePipeBuilder,
   Post,
   UploadedFile,
@@ -28,6 +29,17 @@ export class BrandsController {
   findAll(): Observable<any> {
     return this._productService
       .send({ cmd: 'find_all_brands' }, '')
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  @Get('/brand/:id')
+  find(@Param('id') brandId: string): Observable<any> {
+    return this._productService
+      .send({ cmd: 'find_brand' }, +brandId)
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),
