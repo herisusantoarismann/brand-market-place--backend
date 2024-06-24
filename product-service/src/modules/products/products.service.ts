@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
@@ -33,9 +34,7 @@ export class ProductsService {
       },
     });
 
-    this.cloudFrontUrl = this.configService.get<string>(
-      'CLOUDFRONT_PRODUCT_URL',
-    );
+    this.cloudFrontUrl = this.configService.get<string>('CLOUDFRONT_URL');
   }
 
   getSelectedProperties() {
@@ -162,35 +161,39 @@ export class ProductsService {
       throw new RpcException(new NotFoundException('No file uploaded'));
     }
 
-    const bucketName = this.configService.get<string>(
-      'AWS_S3_PRODUCT_BUCKET_NAME',
-    );
+    const bucketName = this.configService.get<string>('AWS_S3_BUCKET_NAME');
     const uploadParams = {
       Bucket: bucketName,
-      Key: metadata.filename,
+      Key: `products/${metadata.filename}`,
       Body: fileBuffer,
       ContentType: metadata.mimetype,
     };
 
-    const command = new PutObjectCommand(uploadParams);
-    await this.s3Client.send(command);
+    try {
+      const command = new PutObjectCommand(uploadParams);
+      await this.s3Client.send(command);
 
-    const savedFile = await this._prisma.productImage.create({
-      data: {
-        name: metadata.filename,
-        url: `${this.cloudFrontUrl}/${metadata.filename}`,
-      },
-      select: {
-        id: true,
-        name: true,
-        url: true,
-      },
-    });
+      const savedFile = await this._prisma.productImage.create({
+        data: {
+          name: metadata.filename,
+          url: `${this.cloudFrontUrl}/products/${metadata.filename}`,
+        },
+        select: {
+          id: true,
+          name: true,
+          url: true,
+        },
+      });
 
-    if (!savedFile) {
-      throw new RpcException(new NotFoundException('File failed to upload'));
+      if (!savedFile) {
+        throw new RpcException(new NotFoundException('File failed to upload'));
+      }
+
+      return savedFile;
+    } catch (err) {
+      throw new RpcException(
+        new InternalServerErrorException('Oops, there is an error.'),
+      );
     }
-
-    return savedFile;
   }
 }
