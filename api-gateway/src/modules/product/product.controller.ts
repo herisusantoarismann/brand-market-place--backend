@@ -8,6 +8,7 @@ import {
   Param,
   ParseFilePipeBuilder,
   Post,
+  Put,
   Res,
   StreamableFile,
   UploadedFile,
@@ -21,6 +22,7 @@ import { Observable, catchError, of, switchMap, tap, throwError } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import * as fs from 'fs';
 import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('/')
 export class ProductController {
@@ -76,24 +78,24 @@ export class ProductController {
       );
   }
 
-  // @Put('/:id')
-  // update(
-  //   @Param('id') id: string,
-  //   @Body() updateUserProfileDto: UpdateUserProfileDto,
-  // ): Observable<any> {
-  //   return this._userService
-  //     .send(
-  //       {
-  //         cmd: 'update_user_profile',
-  //       },
-  //       { id: Number(id), data: updateUserProfileDto },
-  //     )
-  //     .pipe(
-  //       catchError((error) =>
-  //         throwError(() => new RpcException(error.response)),
-  //       ),
-  //     );
-  // }
+  @Put('/product/:id')
+  update(
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+  ): Observable<any> {
+    return this._productService
+      .send(
+        {
+          cmd: 'update_product',
+        },
+        { id: Number(id), data: updateProductDto },
+      )
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
 
   // @Delete('/:id')
   // delete(@Param('id') id: string): Observable<any> {

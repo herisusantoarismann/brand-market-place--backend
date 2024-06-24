@@ -111,9 +111,9 @@ export class ProductsService {
   }
 
   async update(id: number, data: UpdateProductDto): Promise<IProduct> {
-    const userProfile = await this.findById(id);
+    const product = await this.findById(id);
 
-    if (!userProfile) {
+    if (!product) {
       throw new RpcException(new BadRequestException('Product Not Found'));
     }
 
@@ -122,7 +122,10 @@ export class ProductsService {
         id,
       },
       data: {
-        ...data,
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        sizes: data.sizes,
         images: {
           connect: data.imageIds.map((id) => ({ id })),
         },
