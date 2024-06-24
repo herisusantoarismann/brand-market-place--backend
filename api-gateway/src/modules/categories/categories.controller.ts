@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   HttpStatus,
   Inject,
@@ -13,13 +14,25 @@ import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import * as fs from 'fs';
-import { catchError, throwError } from 'rxjs';
+import { Observable, catchError, throwError } from 'rxjs';
+import { CreateCategoryDto } from './dto/create-category.dto';
 
 @Controller('/')
 export class CategoriesController {
   constructor(
     @Inject('PRODUCT_SERVICE') private readonly _productService: ClientProxy,
   ) {}
+
+  @Post('/category')
+  create(@Body() createCategoryDto: CreateCategoryDto): Observable<any> {
+    return this._productService
+      .send({ cmd: 'create_category' }, createCategoryDto)
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
 
   @Post('/category/upload')
   @UseInterceptors(

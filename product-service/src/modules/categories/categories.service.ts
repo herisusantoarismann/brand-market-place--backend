@@ -8,6 +8,8 @@ import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
 import { PrismaService } from 'src/prisma.service';
 import { ICategoryImage } from 'src/shared/interfaces/category-image.interface';
+import { CreateCategoryDto } from './dto/create-category.dto';
+import { ICategory } from 'src/shared/interfaces/category.interface';
 
 @Injectable()
 export class CategoriesService {
@@ -29,6 +31,40 @@ export class CategoriesService {
     });
 
     this.cloudFrontUrl = this.configService.get<string>('CLOUDFRONT_URL');
+  }
+
+  getSelectedProperties() {
+    return {
+      id: true,
+      name: true,
+      description: true,
+      image: {
+        select: {
+          id: true,
+          url: true,
+        },
+      },
+    };
+  }
+
+  async create(createCategoryDto: CreateCategoryDto): Promise<ICategory> {
+    const category = await this._prisma.category.create({
+      data: {
+        name: createCategoryDto.name,
+        description: createCategoryDto.description,
+        image: {
+          connect: {
+            id: createCategoryDto.imageId,
+          },
+        },
+      },
+      select: this.getSelectedProperties(),
+    });
+
+    return {
+      ...category,
+      image: category.image[0] ?? null,
+    };
   }
 
   async uploadFile(
@@ -54,7 +90,7 @@ export class CategoriesService {
       const command = new PutObjectCommand(uploadParams);
       await this.s3Client.send(command);
 
-      const savedFile = await this._prisma.brandImage.create({
+      const savedFile = await this._prisma.categoryImage.create({
         data: {
           name: metadata.filename,
           url: `${this.cloudFrontUrl}/category/${metadata.filename}`,
