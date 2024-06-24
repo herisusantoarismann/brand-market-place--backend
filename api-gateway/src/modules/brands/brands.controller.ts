@@ -14,13 +14,25 @@ import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import * as fs from 'fs';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
-import { catchError, throwError } from 'rxjs';
+import { Observable, catchError, throwError } from 'rxjs';
+import { CreateBrandDto } from './dto/create-brand.dto';
 
 @Controller('/')
 export class BrandsController {
   constructor(
     @Inject('PRODUCT_SERVICE') private readonly _productService: ClientProxy,
   ) {}
+
+  @Post('/brand')
+  create(@Body() createBrand: CreateBrandDto): Observable<any> {
+    return this._productService
+      .send({ cmd: 'create_brand' }, createBrand)
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
 
   @Post('/brand/upload')
   @UseInterceptors(

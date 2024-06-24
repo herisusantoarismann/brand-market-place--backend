@@ -5,6 +5,7 @@ import { RpcException } from '@nestjs/microservices';
 import { PrismaService } from 'src/prisma.service';
 import { IBrandImage } from 'src/shared/interfaces/brand-image.interface';
 import { IBrand } from 'src/shared/interfaces/brand.interface';
+import { CreateBrandDto } from './dto/create-brand.dto';
 
 @Injectable()
 export class BrandsService {
@@ -26,6 +27,33 @@ export class BrandsService {
     });
 
     this.cloudFrontUrl = this.configService.get<string>('CLOUDFRONT_BRAND_URL');
+  }
+
+  getSelectedProperties() {
+    return {
+      id: true,
+      name: true,
+      image: {
+        select: {
+          id: true,
+          name: true,
+          url: true,
+        },
+      },
+    };
+  }
+
+  async create(createBrandDto: CreateBrandDto): Promise<IBrand> {
+    return this._prisma.brand.create({
+      data: {
+        name: createBrandDto.name,
+        description: createBrandDto.description,
+        image: {
+          connect: createBrandDto.imageIds.map((id) => ({ id })),
+        },
+      },
+      select: this.getSelectedProperties(),
+    });
   }
 
   async uploadFile(

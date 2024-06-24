@@ -1,10 +1,25 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { BrandsService } from './brands.service';
+import { CreateBrandDto } from './dto/create-brand.dto';
+import { IBrand } from 'src/shared/interfaces/brand.interface';
 
 @Controller('brands')
 export class BrandsController {
   constructor(private readonly _brandsService: BrandsService) {}
+
+  @MessagePattern({ cmd: 'create_brand' })
+  async createUserProfile(createBrandDto: CreateBrandDto): Promise<{
+    success: boolean;
+    data: IBrand;
+  }> {
+    const brand = await this._brandsService.create(createBrandDto);
+
+    return {
+      success: true,
+      data: brand,
+    };
+  }
 
   @MessagePattern({
     cmd: 'upload_brand_image',
