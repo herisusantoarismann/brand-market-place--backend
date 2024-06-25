@@ -10,9 +10,19 @@ import { ProductModule } from './modules/product/product.module';
 import { BrandsModule } from './modules/brands/brands.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { WishlistsModule } from './modules/wishlists/wishlists.module';
+import { ReviewsModule } from './modules/reviews/reviews.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), AuthModule, UserModule, ProductModule, BrandsModule, CategoriesModule, WishlistsModule],
+  imports: [
+    ConfigModule.forRoot(),
+    AuthModule,
+    UserModule,
+    ProductModule,
+    BrandsModule,
+    CategoriesModule,
+    WishlistsModule,
+    ReviewsModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,

@@ -10,6 +10,7 @@ import { ConfigModule } from '@nestjs/config';
 import { BrandsModule } from './modules/brands/brands.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { WishlistsModule } from './modules/wishlists/wishlists.module';
+import { ReviewsModule } from './modules/reviews/reviews.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { WishlistsModule } from './modules/wishlists/wishlists.module';
     BrandsModule,
     CategoriesModule,
     WishlistsModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService, ProductsService, PrismaService],
