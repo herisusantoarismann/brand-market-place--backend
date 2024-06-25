@@ -21,6 +21,21 @@ export class ReviewsController {
     };
   }
 
+  @MessagePattern({ cmd: 'find_review' })
+  async find(@Payload() payload: { productId: number; id: number }): Promise<{
+    success: boolean;
+    data: IReview;
+  }> {
+    const { productId, id } = payload;
+
+    const product = await this._reviewService.findById(+productId, +id);
+
+    return {
+      success: true,
+      data: product,
+    };
+  }
+
   @MessagePattern({ cmd: 'create_review' })
   async createBrand(
     @Payload() payload: { productId: number; createReviewDto: CreateReviewDto },

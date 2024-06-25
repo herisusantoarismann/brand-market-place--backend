@@ -20,6 +20,20 @@ export class ReviewsController {
       );
   }
 
+  @Get('/product/:productId/review/:id')
+  find(
+    @Param('productId') productId: string,
+    @Param('id') id: string,
+  ): Observable<any> {
+    return this._productService
+      .send({ cmd: 'find_review' }, { productId: +productId, id: +id })
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
   @Post('/product/:productId/review')
   create(
     @Param('productId') productId: number,

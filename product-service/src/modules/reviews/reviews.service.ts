@@ -38,6 +38,16 @@ export class ReviewsService {
     });
   }
 
+  async findById(productId: number, id: number): Promise<IReview> {
+    return this._prisma.review.findUnique({
+      where: {
+        id,
+        productId,
+      },
+      select: this.getSelectedProperties(),
+    });
+  }
+
   async create(
     productId: number,
     createReviewDto: CreateReviewDto,
