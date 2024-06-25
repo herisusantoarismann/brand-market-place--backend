@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { IReview } from 'src/shared/interfaces/review.interface';
+import { RpcException } from '@nestjs/microservices';
+import { UpdateReviewDto } from './dto/update-review.dto';
 
 @Injectable()
 export class ReviewsService {
@@ -62,6 +64,30 @@ export class ReviewsService {
             id: productId,
           },
         },
+      },
+      select: this.getSelectedProperties(),
+    });
+  }
+
+  async update(
+    productId: number,
+    id: number,
+    data: UpdateReviewDto,
+  ): Promise<IReview> {
+    const review = await this.findById(productId, id);
+
+    if (!review) {
+      throw new RpcException(new BadRequestException('Review Not Found'));
+    }
+
+    return this._prisma.review.update({
+      where: {
+        id,
+        productId,
+      },
+      data: {
+        content: data.content,
+        rating: data.rating,
       },
       select: this.getSelectedProperties(),
     });

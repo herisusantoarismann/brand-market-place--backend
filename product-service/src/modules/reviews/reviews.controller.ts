@@ -3,6 +3,7 @@ import { ReviewsService } from './reviews.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { IReview } from 'src/shared/interfaces/review.interface';
+import { UpdateReviewDto } from './dto/update-review.dto';
 
 @Controller('reviews')
 export class ReviewsController {
@@ -53,6 +54,28 @@ export class ReviewsController {
     return {
       success: true,
       data: review,
+    };
+  }
+
+  @MessagePattern({ cmd: 'update_review' })
+  async updateBrand(
+    @Payload()
+    payload: {
+      productId: number;
+      id: number;
+      data: UpdateReviewDto;
+    },
+  ): Promise<{
+    success: boolean;
+    data: IReview;
+  }> {
+    const { productId, id, data } = payload;
+
+    const brand = await this._reviewService.update(productId, id, data);
+
+    return {
+      success: true,
+      data: brand,
     };
   }
 }

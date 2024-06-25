@@ -1,7 +1,16 @@
-import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { Observable, catchError, throwError } from 'rxjs';
+import { UpdateReviewDto } from './dto/update-review.dto';
 
 @Controller('/')
 export class ReviewsController {
@@ -43,6 +52,26 @@ export class ReviewsController {
       .send(
         { cmd: 'create_review' },
         { productId: +productId, createReviewDto },
+      )
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  @Put('/product/:productId/review/:id')
+  update(
+    @Param('id') id: string,
+    @Param('productId') productId: string,
+    @Body() updateReviewDto: UpdateReviewDto,
+  ): Observable<any> {
+    return this._productService
+      .send(
+        {
+          cmd: 'update_review',
+        },
+        { id: +id, productId: +productId, data: updateReviewDto },
       )
       .pipe(
         catchError((error) =>
