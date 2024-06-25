@@ -71,11 +71,30 @@ export class ReviewsController {
   }> {
     const { productId, id, data } = payload;
 
-    const brand = await this._reviewService.update(productId, id, data);
+    const review = await this._reviewService.update(productId, id, data);
 
     return {
       success: true,
-      data: brand,
+      data: review,
+    };
+  }
+
+  @MessagePattern({
+    cmd: 'delete_review',
+  })
+  async deleteUserProfile(
+    @Payload() payload: { productId: number; id: number },
+  ): Promise<{
+    success: boolean;
+    data: IReview;
+  }> {
+    const { productId, id } = payload;
+
+    const review = await this._reviewService.delete(+productId, +id);
+
+    return {
+      success: true,
+      data: review,
     };
   }
 }

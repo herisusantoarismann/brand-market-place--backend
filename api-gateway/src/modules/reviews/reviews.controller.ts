@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
@@ -72,6 +73,25 @@ export class ReviewsController {
           cmd: 'update_review',
         },
         { id: +id, productId: +productId, data: updateReviewDto },
+      )
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  @Delete('/product/:productId/review/:id')
+  delete(
+    @Param('id') id: string,
+    @Param('productId') productId: string,
+  ): Observable<any> {
+    return this._productService
+      .send(
+        {
+          cmd: 'delete_review',
+        },
+        { productId: +productId, id: +id },
       )
       .pipe(
         catchError((error) =>

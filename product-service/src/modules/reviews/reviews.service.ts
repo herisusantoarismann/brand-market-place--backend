@@ -92,4 +92,20 @@ export class ReviewsService {
       select: this.getSelectedProperties(),
     });
   }
+
+  async delete(productId: number, id: number): Promise<IReview> {
+    const review = await this.findById(productId, id);
+
+    if (!review) {
+      throw new RpcException(new BadRequestException('Review Not Found'));
+    }
+
+    return this._prisma.review.delete({
+      where: {
+        id,
+        productId,
+      },
+      select: this.getSelectedProperties(),
+    });
+  }
 }
