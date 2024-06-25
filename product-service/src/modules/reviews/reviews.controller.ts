@@ -8,6 +8,19 @@ import { IReview } from 'src/shared/interfaces/review.interface';
 export class ReviewsController {
   constructor(private readonly _reviewService: ReviewsService) {}
 
+  @MessagePattern({ cmd: 'find_all_reviews' })
+  async findAll(productId: number): Promise<{
+    success: boolean;
+    data: IReview[];
+  }> {
+    const reviews = await this._reviewService.findAll(+productId);
+
+    return {
+      success: true,
+      data: reviews,
+    };
+  }
+
   @MessagePattern({ cmd: 'create_review' })
   async createBrand(
     @Payload() payload: { productId: number; createReviewDto: CreateReviewDto },

@@ -7,7 +7,7 @@ import { IReview } from 'src/shared/interfaces/review.interface';
 export class ReviewsService {
   constructor(private readonly _prisma: PrismaService) {}
 
-  getProperties() {
+  getSelectedProperties() {
     return {
       id: true,
       userId: true,
@@ -29,6 +29,15 @@ export class ReviewsService {
     };
   }
 
+  async findAll(productId: number): Promise<IReview[]> {
+    return this._prisma.review.findMany({
+      where: {
+        productId,
+      },
+      select: this.getSelectedProperties(),
+    });
+  }
+
   async create(
     productId: number,
     createReviewDto: CreateReviewDto,
@@ -44,7 +53,7 @@ export class ReviewsService {
           },
         },
       },
-      select: this.getProperties(),
+      select: this.getSelectedProperties(),
     });
   }
 }
