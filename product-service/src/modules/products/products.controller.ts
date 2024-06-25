@@ -1,29 +1,9 @@
-import {
-  Controller,
-  Header,
-  HttpStatus,
-  ParseFilePipeBuilder,
-  Req,
-  Res,
-  StreamableFile,
-  UploadedFile,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { ProductsService } from './products.service';
 import { IProduct } from 'src/shared/interfaces/product.interface';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
-import multer, { diskStorage } from 'multer';
-import { v4 as uuidv4 } from 'uuid';
-import { IProductImage } from 'src/shared/interfaces/product-image.interface';
-import * as path from 'path';
-import { createReadStream, writeFile } from 'fs';
-import { Response } from 'express';
-import { join } from 'path';
-import { S3Client } from '@aws-sdk/client-s3';
-import { ConfigService } from '@nestjs/config';
 
 @Controller('products')
 export class ProductsController {
