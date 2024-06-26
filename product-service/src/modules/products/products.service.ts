@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -8,12 +9,15 @@ import { PrismaService } from 'src/prisma.service';
 import { IProduct } from 'src/shared/interfaces/product.interface';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { RpcException } from '@nestjs/microservices';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 import * as path from 'path';
 import { IProductImage } from 'src/shared/interfaces/product-image.interface';
 import * as fs from 'fs';
 import { ConfigService } from '@nestjs/config';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { lastValueFrom } from 'rxjs';
+import { IReview } from 'src/shared/interfaces/review.interface';
+import { ProductImageDto } from './dto/product-image.dto';
 
 @Injectable()
 export class ProductsService {
@@ -21,6 +25,7 @@ export class ProductsService {
   private cloudFrontUrl: string;
 
   constructor(
+    @Inject('AUTH_SERVICE') private readonly _authService: ClientProxy,
     private readonly _prisma: PrismaService,
     private readonly configService: ConfigService,
   ) {
@@ -44,11 +49,18 @@ export class ProductsService {
       description: true,
       price: true,
       sizes: true,
+      categories: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
       images: {
         select: {
           id: true,
           name: true,
           url: true,
+          color: true,
         },
       },
       reviews: {
@@ -62,10 +74,41 @@ export class ProductsService {
     };
   }
 
+  async getUser(
+    userId: number,
+  ): Promise<{ id: number; name: string; email: string }> {
+    const result = this._authService.send({ cmd: 'get_auth_detail' }, +userId);
+    return lastValueFrom(result);
+  }
+
   async findAll(): Promise<IProduct[]> {
-    return this._prisma.product.findMany({
+    const products = await this._prisma.product.findMany({
       select: this.getSelectedProperties(),
     });
+
+    const newProducts = await Promise.all(
+      products.map(async (product: IProduct) => {
+        const reviews = await Promise.all(
+          product.reviews.map(async (review: IReview) => {
+            const user = await this.getUser(review.userId);
+
+            return {
+              id: review.id,
+              user,
+              content: review.content,
+              rating: review.rating,
+            };
+          }),
+        );
+
+        return {
+          ...product,
+          reviews,
+        };
+      }),
+    );
+
+    return newProducts;
   }
 
   async create(createProductDto: CreateProductDto): Promise<IProduct> {
@@ -75,6 +118,9 @@ export class ProductsService {
         description: createProductDto.description,
         price: createProductDto.price,
         sizes: createProductDto.sizes,
+        categories: {
+          connect: createProductDto.categoryIds.map((id) => ({ id })),
+        },
         images: {
           connect: createProductDto.imageIds.map((id) => ({ id })),
         },
@@ -84,12 +130,30 @@ export class ProductsService {
   }
 
   async findById(id: number): Promise<IProduct> {
-    return this._prisma.product.findUnique({
+    const product = await this._prisma.product.findUnique({
       where: {
         id,
       },
       select: this.getSelectedProperties(),
     });
+
+    const reviews = await Promise.all(
+      product.reviews.map(async (review: IReview) => {
+        const user = await this.getUser(review.userId);
+
+        return {
+          id: review.id,
+          user,
+          content: review.content,
+          rating: review.rating,
+        };
+      }),
+    );
+
+    return {
+      ...product,
+      reviews,
+    };
   }
 
   async findByName(name: string): Promise<string> {
@@ -118,7 +182,7 @@ export class ProductsService {
       throw new RpcException(new BadRequestException('Product Not Found'));
     }
 
-    return this._prisma.product.update({
+    const updatedProduct = await this._prisma.product.update({
       where: {
         id,
       },
@@ -127,12 +191,33 @@ export class ProductsService {
         description: data.description,
         price: data.price,
         sizes: data.sizes,
+        categories: {
+          connect: data.categoryIds.map((id) => ({ id })),
+        },
         images: {
           connect: data.imageIds.map((id) => ({ id })),
         },
       },
       select: this.getSelectedProperties(),
     });
+
+    const reviews = await Promise.all(
+      updatedProduct.reviews.map(async (review: IReview) => {
+        const user = await this.getUser(review.userId);
+
+        return {
+          id: review.id,
+          user,
+          content: review.content,
+          rating: review.rating,
+        };
+      }),
+    );
+
+    return {
+      ...updatedProduct,
+      reviews,
+    };
   }
 
   async delete(id: number): Promise<IProduct> {
@@ -142,12 +227,30 @@ export class ProductsService {
       throw new RpcException(new BadRequestException('Product Not Found'));
     }
 
-    return this._prisma.product.delete({
+    const deletedProduct = await this._prisma.product.delete({
       where: {
         id,
       },
       select: this.getSelectedProperties(),
     });
+
+    const reviews = await Promise.all(
+      deletedProduct.reviews.map(async (review: IReview) => {
+        const user = await this.getUser(review.userId);
+
+        return {
+          id: review.id,
+          user,
+          content: review.content,
+          rating: review.rating,
+        };
+      }),
+    );
+
+    return {
+      ...deletedProduct,
+      reviews,
+    };
   }
 
   async uploadFile(
@@ -156,6 +259,7 @@ export class ProductsService {
       mimetype: string;
     },
     fileBuffer: Buffer,
+    productImageDto: ProductImageDto,
   ): Promise<IProductImage> {
     if (!fileBuffer) {
       throw new RpcException(new NotFoundException('No file uploaded'));
@@ -177,11 +281,13 @@ export class ProductsService {
         data: {
           name: metadata.filename,
           url: `${this.cloudFrontUrl}/products/${metadata.filename}`,
+          color: productImageDto.color,
         },
         select: {
           id: true,
           name: true,
           url: true,
+          color: true,
         },
       });
 

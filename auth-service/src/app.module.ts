@@ -25,6 +25,16 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         transport: Transport.TCP,
       },
     ]),
+    ClientsModule.register([
+      {
+        name: 'PRODUCT_SERVICE',
+        options: {
+          host: 'localhost',
+          port: 3003,
+        },
+        transport: Transport.TCP,
+      },
+    ]),
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
