@@ -20,6 +20,15 @@ export class GendersService {
     });
   }
 
+  async findById(id: number): Promise<IGender> {
+    return this._prisma.gender.findUnique({
+      where: {
+        id,
+      },
+      select: this.getSelectedProperties(),
+    });
+  }
+
   async create(createGenderDto: CreateGenderDto): Promise<IGender> {
     return this._prisma.gender.create({
       data: createGenderDto,

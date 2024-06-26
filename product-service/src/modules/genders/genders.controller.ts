@@ -21,6 +21,19 @@ export class GendersController {
     };
   }
 
+  @MessagePattern({ cmd: 'find_gender' })
+  async find(id: number): Promise<{
+    success: boolean;
+    data: IGender;
+  }> {
+    const product = await this._genderService.findById(+id);
+
+    return {
+      success: true,
+      data: product,
+    };
+  }
+
   @MessagePattern({ cmd: 'create_gender' })
   async createBrand(createGenderDto: CreateGenderDto): Promise<{
     success: boolean;
