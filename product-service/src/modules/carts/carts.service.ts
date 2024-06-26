@@ -48,10 +48,10 @@ export class CartsService {
     });
   }
 
-  async findCartItemById(cartId: number): Promise<ICartItem> {
-    return this._prisma.cartItem.findFirst({
+  async findCartItemById(id: number): Promise<ICartItem> {
+    return this._prisma.cartItem.findUnique({
       where: {
-        cartId,
+        id,
       },
       select: this.getSelectedCartItemProperties(),
     });
@@ -97,6 +97,21 @@ export class CartsService {
       },
       data: {
         quantity: data.quantity,
+      },
+      select: this.getSelectedCartItemProperties(),
+    });
+  }
+
+  async delete(id: number): Promise<ICartItem> {
+    const cartItem = await this.findCartItemById(id);
+
+    if (!cartItem) {
+      throw new RpcException(new BadRequestException('Cart Item Not Found'));
+    }
+
+    return this._prisma.cartItem.delete({
+      where: {
+        id,
       },
       select: this.getSelectedCartItemProperties(),
     });

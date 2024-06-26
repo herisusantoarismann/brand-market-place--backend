@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
@@ -50,6 +51,22 @@ export class CartsController {
   ): Observable<any> {
     return this._productService
       .send({ cmd: 'update_cart_item' }, { id: +cartItemId, updateCartItemDto })
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  @Delete('user/:userId/cart/:cartItemId')
+  delete(@Param('cartItemId') id: string): Observable<any> {
+    return this._productService
+      .send(
+        {
+          cmd: 'delete_cart_item',
+        },
+        +id,
+      )
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),

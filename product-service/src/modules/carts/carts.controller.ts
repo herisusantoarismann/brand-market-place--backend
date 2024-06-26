@@ -83,4 +83,19 @@ export class CartsController {
       data: cartItem,
     };
   }
+
+  @MessagePattern({
+    cmd: 'delete_cart_item',
+  })
+  async deleteCartItem(id: number): Promise<{
+    success: boolean;
+    data: ICartItem;
+  }> {
+    const cartItem = await this._cartService.delete(+id);
+
+    return {
+      success: true,
+      data: cartItem,
+    };
+  }
 }
