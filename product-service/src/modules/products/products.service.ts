@@ -48,6 +48,12 @@ export class ProductsService {
       description: true,
       price: true,
       sizes: true,
+      categories: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
       images: {
         select: {
           id: true,
@@ -110,6 +116,9 @@ export class ProductsService {
         description: createProductDto.description,
         price: createProductDto.price,
         sizes: createProductDto.sizes,
+        categories: {
+          connect: createProductDto.categoryIds.map((id) => ({ id })),
+        },
         images: {
           connect: createProductDto.imageIds.map((id) => ({ id })),
         },
@@ -180,6 +189,9 @@ export class ProductsService {
         description: data.description,
         price: data.price,
         sizes: data.sizes,
+        categories: {
+          connect: data.categoryIds.map((id) => ({ id })),
+        },
         images: {
           connect: data.imageIds.map((id) => ({ id })),
         },

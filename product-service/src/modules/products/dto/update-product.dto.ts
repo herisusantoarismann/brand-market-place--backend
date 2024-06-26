@@ -21,4 +21,8 @@ export class UpdateProductDto {
   @IsArray()
   @IsNumber({}, { each: true })
   imageIds: number[];
+
+  @IsArray()
+  @IsNumber({}, { each: true })
+  categoryIds: number[];
 }
