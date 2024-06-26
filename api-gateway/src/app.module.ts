@@ -1,4 +1,9 @@
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
@@ -13,6 +18,7 @@ import { WishlistsModule } from './modules/wishlists/wishlists.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { GendersModule } from './modules/genders/genders.module';
 import { CartsModule } from './modules/carts/carts.module';
+import { AuthMiddleware } from './shared/middlewares/auth.middleware';
 
 @Module({
   imports: [
@@ -36,4 +42,17 @@ import { CartsModule } from './modules/carts/carts.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthMiddleware).forRoutes(
+      {
+        path: 'users',
+        method: RequestMethod.ALL,
+      },
+      {
+        path: 'user',
+        method: RequestMethod.ALL,
+      },
+    );
+  }
+}
