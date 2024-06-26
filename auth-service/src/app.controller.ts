@@ -11,6 +11,7 @@ export class AppController {
   constructor(
     private readonly appService: AppService,
     @Inject('USER_SERVICE') private readonly _userService: ClientProxy,
+    @Inject('PRODUCT_SERVICE') private readonly _productService: ClientProxy,
   ) {}
 
   async onApplicationBootstrap() {
@@ -23,11 +24,17 @@ export class AppController {
     data: IUser;
   }> {
     const user = await this.appService.register(registerDto);
+
+    // create user profile
     const result = this._userService.send(
       { cmd: 'create_user_profile' },
       { userId: user.id, phoneNumber: null },
     );
     await lastValueFrom(result);
+
+    // create user cart
+    const cart = this._productService.send({ cmd: 'create_cart' }, +user.id);
+    await lastValueFrom(cart);
 
     return {
       success: true,
