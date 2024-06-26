@@ -3,6 +3,7 @@ import { GendersService } from './genders.service';
 import { CreateGenderDto } from './dto/create-gender.dto';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { IGender } from 'src/shared/interfaces/gender.interface';
+import { UpdateGenderDto } from './dto/update-gender.dto';
 
 @Controller('genders')
 export class GendersController {
@@ -26,11 +27,11 @@ export class GendersController {
     success: boolean;
     data: IGender;
   }> {
-    const product = await this._genderService.findById(+id);
+    const gender = await this._genderService.findById(+id);
 
     return {
       success: true,
-      data: product,
+      data: gender,
     };
   }
 
@@ -40,6 +41,27 @@ export class GendersController {
     data: IGender;
   }> {
     const gender = await this._genderService.create(createGenderDto);
+
+    return {
+      success: true,
+      data: gender,
+    };
+  }
+
+  @MessagePattern({ cmd: 'update_gender' })
+  async updateBrand(
+    @Payload()
+    payload: {
+      id: number;
+      data: UpdateGenderDto;
+    },
+  ): Promise<{
+    success: boolean;
+    data: IGender;
+  }> {
+    const { id, data } = payload;
+
+    const gender = await this._genderService.update(id, data);
 
     return {
       success: true,
