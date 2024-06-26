@@ -12,6 +12,7 @@ import { CategoriesModule } from './modules/categories/categories.module';
 import { WishlistsModule } from './modules/wishlists/wishlists.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { GendersModule } from './modules/genders/genders.module';
+import { CartsModule } from './modules/carts/carts.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { GendersModule } from './modules/genders/genders.module';
     WishlistsModule,
     ReviewsModule,
     GendersModule,
+    CartsModule,
   ],
   controllers: [AppController],
   providers: [
