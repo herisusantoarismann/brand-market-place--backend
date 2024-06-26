@@ -1,18 +1,20 @@
 import { Controller } from '@nestjs/common';
 import { CartsService } from './carts.service';
-import { MessagePattern } from '@nestjs/microservices';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { ICart } from 'src/shared/interfaces/cart.interface';
+import { CreateCartItemDto } from './dto/create-cart-item.dto';
+import { ICartItem } from 'src/shared/interfaces/cart-item.interface';
 
 @Controller('carts')
 export class CartsController {
   constructor(private readonly _cartService: CartsService) {}
 
   @MessagePattern({ cmd: 'find_cart' })
-  async find(userId: number): Promise<{
+  async findCart(userId: number): Promise<{
     success: boolean;
     data: ICart;
   }> {
-    const cart = await this._cartService.findById(+userId);
+    const cart = await this._cartService.findCartById(+userId);
 
     return {
       success: true,
@@ -21,7 +23,7 @@ export class CartsController {
   }
 
   @MessagePattern({ cmd: 'create_cart' })
-  async createBrand(userId: number): Promise<{
+  async createCart(userId: number): Promise<{
     success: boolean;
     data: ICart;
   }> {
@@ -30,6 +32,30 @@ export class CartsController {
     return {
       success: true,
       data: review,
+    };
+  }
+
+  @MessagePattern({ cmd: 'create_cart_item' })
+  async createCartItem(
+    @Payload()
+    payload: {
+      userId: number;
+      createCartItemDto: CreateCartItemDto;
+    },
+  ): Promise<{
+    success: boolean;
+    data: ICartItem;
+  }> {
+    const { userId, createCartItemDto } = payload;
+
+    const cartItem = await this._cartService.createCartItem(
+      +userId,
+      createCartItemDto,
+    );
+
+    return {
+      success: true,
+      data: cartItem,
     };
   }
 }
