@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { CreateGenderDto } from './dto/create-gender.dto';
 import { Observable, catchError, throwError } from 'rxjs';
@@ -8,6 +8,17 @@ export class GendersController {
   constructor(
     @Inject('PRODUCT_SERVICE') private readonly _productService: ClientProxy,
   ) {}
+
+  @Get('/genders')
+  findAll(): Observable<any> {
+    return this._productService
+      .send({ cmd: 'find_all_genders' }, '')
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
 
   @Post('/gender')
   create(@Body() createGenderDto: CreateGenderDto): Observable<any> {

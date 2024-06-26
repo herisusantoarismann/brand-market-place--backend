@@ -14,6 +14,12 @@ export class GendersService {
     };
   }
 
+  async findAll(): Promise<IGender[]> {
+    return this._prisma.gender.findMany({
+      select: this.getSelectedProperties(),
+    });
+  }
+
   async create(createGenderDto: CreateGenderDto): Promise<IGender> {
     return this._prisma.gender.create({
       data: createGenderDto,

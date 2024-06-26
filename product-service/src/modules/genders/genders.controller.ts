@@ -8,6 +8,19 @@ import { IGender } from 'src/shared/interfaces/gender.interface';
 export class GendersController {
   constructor(private readonly _genderService: GendersService) {}
 
+  @MessagePattern({ cmd: 'find_all_genders' })
+  async findAll(): Promise<{
+    success: boolean;
+    data: IGender[];
+  }> {
+    const reviews = await this._genderService.findAll();
+
+    return {
+      success: true,
+      data: reviews,
+    };
+  }
+
   @MessagePattern({ cmd: 'create_gender' })
   async createBrand(createGenderDto: CreateGenderDto): Promise<{
     success: boolean;
