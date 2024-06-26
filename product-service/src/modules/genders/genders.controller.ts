@@ -68,4 +68,19 @@ export class GendersController {
       data: gender,
     };
   }
+
+  @MessagePattern({
+    cmd: 'delete_gender',
+  })
+  async delete(id: number): Promise<{
+    success: boolean;
+    data: IGender;
+  }> {
+    const gender = await this._genderService.delete(+id);
+
+    return {
+      success: true,
+      data: gender,
+    };
+  }
 }

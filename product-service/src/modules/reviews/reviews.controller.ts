@@ -82,9 +82,7 @@ export class ReviewsController {
   @MessagePattern({
     cmd: 'delete_review',
   })
-  async deleteUserProfile(
-    @Payload() payload: { productId: number; id: number },
-  ): Promise<{
+  async delete(@Payload() payload: { productId: number; id: number }): Promise<{
     success: boolean;
     data: IReview;
   }> {

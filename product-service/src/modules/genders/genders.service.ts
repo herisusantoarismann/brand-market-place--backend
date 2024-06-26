@@ -53,4 +53,19 @@ export class GendersService {
       select: this.getSelectedProperties(),
     });
   }
+
+  async delete(id: number): Promise<IGender> {
+    const gender = await this.findById(id);
+
+    if (!gender) {
+      throw new RpcException(new BadRequestException('Gender Not Found'));
+    }
+
+    return this._prisma.gender.delete({
+      where: {
+        id,
+      },
+      select: this.getSelectedProperties(),
+    });
+  }
 }

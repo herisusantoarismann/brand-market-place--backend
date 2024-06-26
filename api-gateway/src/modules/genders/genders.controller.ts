@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
@@ -62,6 +63,22 @@ export class GendersController {
           cmd: 'update_gender',
         },
         { id: +id, data: updateGenderDto },
+      )
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  @Delete('/gender/:id')
+  delete(@Param('id') id: string): Observable<any> {
+    return this._productService
+      .send(
+        {
+          cmd: 'delete_gender',
+        },
+        +id,
       )
       .pipe(
         catchError((error) =>
