@@ -17,6 +17,7 @@ import { ConfigService } from '@nestjs/config';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { lastValueFrom } from 'rxjs';
 import { IReview } from 'src/shared/interfaces/review.interface';
+import { ProductImageDto } from './dto/product-image.dto';
 
 @Injectable()
 export class ProductsService {
@@ -59,6 +60,7 @@ export class ProductsService {
           id: true,
           name: true,
           url: true,
+          color: true,
         },
       },
       reviews: {
@@ -257,6 +259,7 @@ export class ProductsService {
       mimetype: string;
     },
     fileBuffer: Buffer,
+    productImageDto: ProductImageDto,
   ): Promise<IProductImage> {
     if (!fileBuffer) {
       throw new RpcException(new NotFoundException('No file uploaded'));
@@ -278,11 +281,13 @@ export class ProductsService {
         data: {
           name: metadata.filename,
           url: `${this.cloudFrontUrl}/products/${metadata.filename}`,
+          color: productImageDto.color,
         },
         select: {
           id: true,
           name: true,
           url: true,
+          color: true,
         },
       });
 

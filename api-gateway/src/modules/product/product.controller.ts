@@ -24,6 +24,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as fs from 'fs';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductImageDto } from './dto/product-image.dto';
 
 @Controller('/')
 export class ProductController {
@@ -150,6 +151,7 @@ export class ProductController {
         }),
     )
     file: Express.Multer.File,
+    @Body() productImageDto: ProductImageDto,
   ): Promise<any> {
     const metadata = {
       filename: file.filename,
@@ -163,7 +165,10 @@ export class ProductController {
     const fileBase64 = fileBuffer.toString('base64');
 
     const result = this._productService
-      .send({ cmd: 'upload_product_image' }, { metadata, fileBase64 })
+      .send(
+        { cmd: 'upload_product_image' },
+        { metadata, fileBase64, productImageDto },
+      )
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),

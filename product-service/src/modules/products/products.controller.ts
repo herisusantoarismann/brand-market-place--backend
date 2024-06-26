@@ -4,6 +4,7 @@ import { ProductsService } from './products.service';
 import { IProduct } from 'src/shared/interfaces/product.interface';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductImageDto } from './dto/product-image.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -96,11 +97,16 @@ export class ProductsController {
         mimetype: string;
       };
       fileBase64: string;
+      productImageDto: ProductImageDto;
     },
   ): Promise<{ success: Boolean; data: any }> {
-    const { metadata, fileBase64 } = payload;
+    const { metadata, fileBase64, productImageDto } = payload;
     const fileBuffer = Buffer.from(fileBase64, 'base64');
-    const file = await this._productService.uploadFile(metadata, fileBuffer);
+    const file = await this._productService.uploadFile(
+      metadata,
+      fileBuffer,
+      productImageDto,
+    );
 
     return {
       success: true,
