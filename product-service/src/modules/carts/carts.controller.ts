@@ -4,6 +4,7 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 import { ICart } from 'src/shared/interfaces/cart.interface';
 import { CreateCartItemDto } from './dto/create-cart-item.dto';
 import { ICartItem } from 'src/shared/interfaces/cart-item.interface';
+import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 
 @Controller('carts')
 export class CartsController {
@@ -51,6 +52,30 @@ export class CartsController {
     const cartItem = await this._cartService.createCartItem(
       +userId,
       createCartItemDto,
+    );
+
+    return {
+      success: true,
+      data: cartItem,
+    };
+  }
+
+  @MessagePattern({ cmd: 'update_cart_item' })
+  async updateCartItem(
+    @Payload()
+    payload: {
+      id: number;
+      updateCartItemDto: UpdateCartItemDto;
+    },
+  ): Promise<{
+    success: boolean;
+    data: ICartItem;
+  }> {
+    const { id, updateCartItemDto } = payload;
+
+    const cartItem = await this._cartService.updateCartItem(
+      +id,
+      updateCartItemDto,
     );
 
     return {

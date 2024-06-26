@@ -1,7 +1,16 @@
-import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { Observable, catchError, throwError } from 'rxjs';
 import { CreateCartItemDto } from './dto/create-cart-item.dto';
+import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 
 @Controller('/')
 export class CartsController {
@@ -21,12 +30,26 @@ export class CartsController {
   }
 
   @Post('user/:userId/cart/add')
-  findCartItem(
+  createCartItem(
     @Param('userId') userId: string,
     @Body() createCartItemDto: CreateCartItemDto,
   ): Observable<any> {
     return this._productService
       .send({ cmd: 'create_cart_item' }, { userId: +userId, createCartItemDto })
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  @Patch('user/:userId/cart/:cartItemId')
+  updateQuantityCartItem(
+    @Param('cartItemId') cartItemId: string,
+    @Body() updateCartItemDto: UpdateCartItemDto,
+  ): Observable<any> {
+    return this._productService
+      .send({ cmd: 'update_cart_item' }, { id: +cartItemId, updateCartItemDto })
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),

@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { ICart } from 'src/shared/interfaces/cart.interface';
 import { CreateCartItemDto } from './dto/create-cart-item.dto';
 import { ICartItem } from 'src/shared/interfaces/cart-item.interface';
+import { UpdateCartItemDto } from './dto/update-cart-item.dto';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class CartsService {
@@ -46,6 +48,15 @@ export class CartsService {
     });
   }
 
+  async findCartItemById(cartId: number): Promise<ICartItem> {
+    return this._prisma.cartItem.findFirst({
+      where: {
+        cartId,
+      },
+      select: this.getSelectedCartItemProperties(),
+    });
+  }
+
   async create(userId: number): Promise<ICart> {
     return this._prisma.cart.create({
       data: {
@@ -65,6 +76,27 @@ export class CartsService {
       data: {
         ...createCartItemDto,
         cartId: cart.id,
+      },
+      select: this.getSelectedCartItemProperties(),
+    });
+  }
+
+  async updateCartItem(
+    id: number,
+    data: UpdateCartItemDto,
+  ): Promise<ICartItem> {
+    const cartItem = await this.findCartItemById(id);
+
+    if (!cartItem) {
+      throw new RpcException(new BadRequestException('Cart Item Not Found'));
+    }
+
+    return this._prisma.cartItem.update({
+      where: {
+        id,
+      },
+      data: {
+        quantity: data.quantity,
       },
       select: this.getSelectedCartItemProperties(),
     });
