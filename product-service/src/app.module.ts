@@ -10,6 +10,7 @@ import { BrandsModule } from './modules/brands/brands.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { WishlistsModule } from './modules/wishlists/wishlists.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
+import { GendersModule } from './modules/genders/genders.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
     CategoriesModule,
     WishlistsModule,
     ReviewsModule,
+    GendersModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
