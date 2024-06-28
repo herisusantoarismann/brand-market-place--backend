@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, Inject, Post } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { Observable, catchError, throwError } from 'rxjs';
 import { RegisterDto } from './dto/register.dto';
@@ -25,6 +25,7 @@ export class AuthController {
       );
   }
 
+  @HttpCode(200)
   @Post('/login')
   login(@Body() loginDto: LoginDto): Observable<any> {
     return this.authService
